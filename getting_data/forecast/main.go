@@ -32,7 +32,7 @@ type Previsao struct {
 	Iuv    float32 `xml:"iuv"`
 }
 
-type ForecastSource struct {
+type Station struct {
 	StationId string `bson:"_id"`
 	CodCPETEC string `bson:"codCPTEC"`
 }
@@ -86,14 +86,14 @@ func getForecastForSevenDays(stationCode string) (Forecast, error) {
 	return forecast, err
 }
 
-func getForecastSources() []ForecastSource {
+func getStations() []Station {
 	dataBaseURI := "mongodb://127.0.0.1:27017"
 
 	mongoClient := mongoapi.StartConnection(dataBaseURI)
 	collection := mongoClient.Database("gdsudao-test").Collection("stations")
 	defer mongoapi.CloseConnection(*mongoClient)
 
-	var sources []ForecastSource
+	var sources []Station
 	filterCursor, err := collection.Find(context.TODO(), bson.M{})
 	if err != nil {
 		log.Fatal(err)
