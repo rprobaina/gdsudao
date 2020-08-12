@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"mongoapi"
@@ -25,8 +24,8 @@ type Medicao struct {
 
 // Station tipo de dado que contem os codigos do CPTEC e do INMET de um estação
 type Station struct {
-	CodCPTEC string `bson:"codCPTEC"`
-	CodINMET string `bson:"codINMET"`
+	CodCPTEC string `bson:"codigoCPTEC"`
+	CodINMET string `bson:"codigoINMET"`
 }
 
 // getStations retorna todas as estações inseridas no banco dedados
@@ -73,7 +72,6 @@ func main() {
 
 		// Baixa os dados da API do INMET pada estação da iteração
 		baseURL := "https://apitempo.inmet.gov.br/estacao/diaria/" + date + "/" + date + "/" + station.CodINMET
-		fmt.Println("Donloading the files...")
 		utils.Wget(baseURL, "medicao.json")
 		defer utils.Rm("medicao.json")
 
@@ -84,7 +82,7 @@ func main() {
 		json.Unmarshal(byteValue, &medicoes)
 
 		// Valida se o valor existe e adiciona ao banco de dados
-		if medicoes[0].TempMin != "" || medicoes[0].TempMax != "" {
+		if (medicoes[0].TempMin != "") || (medicoes[0].TempMax != "") {
 			// Realiza as conversões necessárias
 			tMax, _ := strconv.ParseFloat(medicoes[0].TempMax, 64)
 			tMin, _ := strconv.ParseFloat(medicoes[0].TempMin, 64)
