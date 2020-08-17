@@ -80,7 +80,7 @@ func getStations(stationsURL string) {
 	collection := mongoClient.Database("gdsudao").Collection("estacoes")
 	defer mongoapi.CloseConnection(*mongoClient)
 
-	// Downloading files from INMET
+	// Baixa dos dados do from INMET
 	utils.Wget(stationsURL, "estacoes.json")
 	defer utils.Rm("estacoes.json")
 
