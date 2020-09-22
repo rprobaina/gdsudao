@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"mongoapi"
@@ -11,130 +12,6 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 )
-
-/*
-func getAllUsers(w http.ResponseWriter, r *http.Request) {
-
-	URI := "mongodb://localhost:27017"
-	client := mong.StartConnection(URI)
-	collection := client.Database("golang-test").Collection("users")
-
-	defer mong.CloseConnection(*client)
-
-	users, err := mong.QueryUsers(*client, *collection, bson.D{{}})
-
-	if err != nil {
-		fmt.Fprintf(w, "400 - Bad Requestion")
-	} else {
-		for _, u := range users {
-			fmt.Println(u)
-		}
-
-		json.NewEncoder(w).Encode(users)
-	}
-
-}
-
-func getUser(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	email := vars["email"]
-
-	URI := "mongodb://localhost:27017"
-	client := mong.StartConnection(URI)
-	collection := client.Database("golang-test").Collection("users")
-
-	defer mong.CloseConnection(*client)
-
-	consulta := bson.D{{"email", email}}
-	user, err := mong.QueryUser(*client, *collection, consulta)
-
-	if err != nil {
-		fmt.Fprintf(w, "404 - Not Found")
-	} else {
-		json.NewEncoder(w).Encode(user)
-	}
-}
-
-func postUser(w http.ResponseWriter, r *http.Request) {
-	userName := r.FormValue("name")
-	userMail := r.FormValue("email")
-	userAge := r.FormValue("age")
-	fmt.Println(userName, userMail, userAge)
-	age, err := strconv.Atoi(userAge)
-	if err != nil {
-		log.Fatal(err)
-	}
-	user := mong.User{userName, userMail, age}
-	fmt.Println(user)
-
-	URI := "mongodb://localhost:27017"
-	client := mong.StartConnection(URI)
-	collection := client.Database("golang-test").Collection("users")
-
-	defer mong.CloseConnection(*client)
-
-	mong.InsertUser(*client, *collection, user)
-
-}
-
-func putUser(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	email := vars["email"]
-
-	//	Dados para a atualização
-	userName := r.FormValue("name")
-	userMail := r.FormValue("email")
-	userAge := r.FormValue("age")
-
-	age, err := strconv.Atoi(userAge)
-	if err != nil {
-		log.Fatal(err)
-	}
-	user := mong.User{userName, userMail, age}
-
-	URI := "mongodb://localhost:27017"
-	client := mong.StartConnection(URI)
-	collection := client.Database("golang-test").Collection("users")
-	defer mong.CloseConnection(*client)
-
-	consulta := bson.D{{"email", email}}
-	atualizacao := bson.D{
-		{"$set", bson.D{{"name", user.Name}}},
-		{"$set", bson.D{{"email", user.Email}}},
-		{"$set", bson.D{{"age", user.Age}}}}
-
-	err = mong.UpdateUser(*client, *collection, consulta, atualizacao)
-
-	if err != nil {
-		fmt.Fprintf(w, "400 - Bad Request")
-	}
-}
-
-//	Delete a user by an email passed in lolcalhost:8081/users/email
-func deleteUser(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	email := vars["email"]
-
-	URI := "mongodb://localhost:27017"
-	client := mong.StartConnection(URI)
-	collection := client.Database("golang-test").Collection("users")
-
-	defer mong.CloseConnection(*client)
-
-	consulta := bson.D{{"email", email}}
-
-	err := mong.DeleteUser(*client, *collection, consulta)
-
-	if err != nil {
-		fmt.Fprintf(w, "400 - Bad Request")
-	} else {
-		fmt.Fprintf(w, "200 - Ok")
-	}
-}
-*/
 
 // homePage returns a simple message of this API
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +34,7 @@ func getNearStation(w http.ResponseWriter, r *http.Request) {
 	lat, _ := strconv.ParseFloat(latitude, 64)
 	lon, _ := strconv.ParseFloat(longitude, 64)
 
+	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
 	query := bson.D{
 		{"localizacao.coordenadas", bson.D{
 			{"$near", bson.D{
@@ -167,30 +45,117 @@ func getNearStation(w http.ResponseWriter, r *http.Request) {
 			}},
 		}}
 
-	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
-
-	var resultado bson.D
+	var resultado bson.M
 	err := collection.FindOne(context.TODO(), query).Decode(&resultado)
 
+	if err != nil {
+		fmt.Println("Localização invalida")
+	} else {
+		json.NewEncoder(w).Encode(resultado)
+	}
+}
+
+// getNormais retorna os dados da estação meteorológica mais proxima
+func getNormais(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	codigoEstacao := vars["nomeEstacao"]
+
+	// Conexão com o banco de dados
+	dataBaseURI := "mongodb://127.0.0.1:27017"
+	mongoClient := mongoapi.StartConnection(dataBaseURI)
+	collection := mongoClient.Database("gdsudao").Collection("normais")
+	defer mongoapi.CloseConnection(*mongoClient)
+
+	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
+	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
+
+	query := bson.M{"nomeEstacao": codigoEstacao}
+
+	var normais bson.M
+	err := collection.FindOne(context.TODO(), query).Decode(&normais)
+
 	fmt.Println(err)
-	fmt.Println(resultado)
+	fmt.Println(normais)
 
-	// Conexão com o bando de dados
-	/*
-		dataBaseURI := "mongodb://127.0.0.1:27017"
-		mongoClient := mongoapi.StartConnection(dataBaseURI)
-		collection := mongoClient.Database("gdsudao").Collection("estacoes")
-		defer mongoapi.CloseConnection(*mongoClient)
+	if err != nil {
+		fmt.Println("Localização invalida")
+	} else {
+		json.NewEncoder(w).Encode(normais)
+	}
+}
 
+// getDiarios
+func getDiarios(w http.ResponseWriter, r *http.Request) {
 
-		consulta := bson.D{{"email", email}}
-		user, err := mong.QueryUser(*client, *collection, consulta)
-	*/
-	//if err != nil {
-	fmt.Fprintf(w, "404 - Not Found"+"Lat: "+latitude+"  Lon: "+longitude)
-	//} else {
-	//json.NewEncoder(w).Encode(user)
-	//}
+	vars := mux.Vars(r)
+	codigoINMET := vars["codigoINMET"]
+
+	// Conexão com o banco de dados
+	dataBaseURI := "mongodb://127.0.0.1:27017"
+	mongoClient := mongoapi.StartConnection(dataBaseURI)
+	collection := mongoClient.Database("gdsudao").Collection("diarios")
+	defer mongoapi.CloseConnection(*mongoClient)
+
+	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
+	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
+
+	query := bson.M{"codigoINMET": codigoINMET}
+
+	cur, err := collection.Find(context.Background(), query)
+	if err != nil {
+		//log.Fatal(err)
+	}
+	defer cur.Close(context.Background())
+	for cur.Next(context.Background()) {
+		// To decode into a struct, use cursor.Decode()
+		var result bson.D
+		err := cur.Decode(&result)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// do something with result...
+		fmt.Println(result)
+		// To get the raw bson bytes use cursor.Current
+		//raw := cur.Current
+		// do something with raw...
+	}
+	if err := cur.Err(); err != nil {
+		fmt.Println("Localização invalida")
+	} else {
+
+		//json.NewEncoder(w).Encode(result)
+	}
+}
+
+// getPrevisoes
+func getPrevisoes(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	codigoEstacao := vars["codigoINMET"]
+
+	// Conexão com o banco de dados
+	dataBaseURI := "mongodb://127.0.0.1:27017"
+	mongoClient := mongoapi.StartConnection(dataBaseURI)
+	collection := mongoClient.Database("gdsudao").Collection("previsoes")
+	defer mongoapi.CloseConnection(*mongoClient)
+
+	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
+	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
+
+	query := bson.M{"nomeEstacao": codigoEstacao}
+
+	var normais bson.M
+	err := collection.FindOne(context.TODO(), query).Decode(&normais)
+
+	fmt.Println(err)
+	fmt.Println(normais)
+
+	if err != nil {
+		fmt.Println("Localização invalida")
+	} else {
+		json.NewEncoder(w).Encode(normais)
+	}
 }
 
 //	Trata das requisições (mapeia a requisição para a função adequada)
@@ -198,11 +163,10 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/estacao/maisproxima/{latitude}/{longitude}", getNearStation).Methods("GET")
-	//myRouter.HandleFunc("/users", getAllUsers).Methods("GET")
-	//myRouter.HandleFunc("/users/{email}", getUser).Methods("GET")
-	//myRouter.HandleFunc("/users", postUser).Methods("POST")
-	//myRouter.HandleFunc("/users/{email}", putUser).Methods("PUT")
-	//myRouter.HandleFunc("/users/{email}", deleteUser).Methods("DELETE")
+	myRouter.HandleFunc("/normais/{nomeEstacao}", getNormais).Methods("GET")
+	myRouter.HandleFunc("/diarios/{codigoINMET}/{data_inicio}/{data_fim}", getDiarios).Methods("GET")
+	myRouter.HandleFunc("/previsoes/{codigoCPTEC}/{data_inicio}/{data_fim}", getPrevisoes).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":8082", myRouter))
 }
 
