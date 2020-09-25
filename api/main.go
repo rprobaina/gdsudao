@@ -12,22 +12,28 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Station tipo de dado que contem os codigos do CPTEC e do INMET de um estação
-type Station struct {
-	DataAtualizacao string
-}
-
-// homePage returns a simple message of this API
+// homePage retorna as informações gerais da API
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is a simple REST API writen in Golang that uses MongoDB as database.")
+	fmt.Fprintf(w, "<h1> GDSudao API </h1>")
+	fmt.Fprintf(w, "<p> Essa é uma API utilizada pelo projeto GDSusão. </p>")
+	fmt.Fprintf(w, "<p> Como usar: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<p> Retorna dados da estação meteorológica mais próxima: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/estacao/maisproxima/{latitude}/{longitude} </ul>")
+	fmt.Fprintf(w, "<p> Retorna dados de normais climatológicas de uma estação: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/normais/{nomeEstacao} </ul>")
+	fmt.Fprintf(w, "<p> Retorna dados diarios de uma estação: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/diarios/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
+	fmt.Fprintf(w, "<p> Retorna dados de previsão do tempo de uma estação: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/previsoes/{codigoINMET}/{dataAtual} </ul>")
 }
 
 // getNearStation retorna os dados da estação meteorológica mais proxima
 func getNearStation(w http.ResponseWriter, r *http.Request) {
 
+	// Recebe os parametros enviados através da requisição HTTP
 	vars := mux.Vars(r)
 	latitude := vars["latitude"]
 	longitude := vars["longitude"]
@@ -38,10 +44,11 @@ func getNearStation(w http.ResponseWriter, r *http.Request) {
 	collection := mongoClient.Database("gdsudao").Collection("estacoes")
 	defer mongoapi.CloseConnection(*mongoClient)
 
+	// Converte as coordenadas para float64
 	lat, _ := strconv.ParseFloat(latitude, 64)
 	lon, _ := strconv.ParseFloat(longitude, 64)
 
-	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
+	// Consulta geoespacial
 	query := bson.D{
 		{"localizacao.coordenadas", bson.D{
 			{"$near", bson.D{
@@ -52,19 +59,21 @@ func getNearStation(w http.ResponseWriter, r *http.Request) {
 			}},
 		}}
 
+	// Realiza a consulta no banco de dados e retorna o valor encontrado
 	var resultado bson.M
 	err := collection.FindOne(context.TODO(), query).Decode(&resultado)
 
 	if err != nil {
-		fmt.Println("Localização invalida")
+		fmt.Fprintf(w, "Coordenadas inválidas")
 	} else {
 		json.NewEncoder(w).Encode(resultado)
 	}
 }
 
-// getNormais retorna os dados da estação meteorológica mais proxima
+// getNormais retorna os dados das normais climatológicas de uma estação meteorológica
 func getNormais(w http.ResponseWriter, r *http.Request) {
 
+	// Recebe os parametros enviados através da requisição HTTP
 	vars := mux.Vars(r)
 	codigoEstacao := vars["nomeEstacao"]
 
@@ -74,27 +83,24 @@ func getNormais(w http.ResponseWriter, r *http.Request) {
 	collection := mongoClient.Database("gdsudao").Collection("normais")
 	defer mongoapi.CloseConnection(*mongoClient)
 
-	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
-	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
-
+	// Consulta do banco de dados
 	query := bson.M{"nomeEstacao": codigoEstacao}
 
+	// Realiza a consulta no banco de dados e retorna o valor encontrado
 	var normais bson.M
 	err := collection.FindOne(context.TODO(), query).Decode(&normais)
 
-	fmt.Println(err)
-	fmt.Println(normais)
-
 	if err != nil {
-		fmt.Println("Localização invalida")
+		fmt.Fprintf(w, "Estação inexistente")
 	} else {
 		json.NewEncoder(w).Encode(normais)
 	}
 }
 
-// getDiarios
+// getDiarios retorna os dados de medições diárias coletados por uma estação meteorológica
 func getDiarios(w http.ResponseWriter, r *http.Request) {
 
+	// Recebe os parametros enviados através da requisição HTTP
 	vars := mux.Vars(r)
 	codigoINMET := vars["codigoINMET"]
 	dataInicial := vars["dataInicial"]
@@ -106,19 +112,15 @@ func getDiarios(w http.ResponseWriter, r *http.Request) {
 	collection := mongoClient.Database("gdsudao").Collection("diarios")
 	defer mongoapi.CloseConnection(*mongoClient)
 
-	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
-	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
-
-	// Consulta testada no compas
-	// {codigoINMET: "A827", dataMedicao: {"$gte": ISODate('2020-09-17T00:00:00.000Z'), "$lte": ISODate('2020-09-20T00:00:00.000Z')}}
-
 	// Conversao das datas para o formato ISO
 	layoutISO := "2006-01-02"
 	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
 	dataFinalISO, _ := time.Parse(layoutISO, dataFinal)
 
+	// Consulta do banco de dados
 	query := bson.M{"codigoINMET": codigoINMET, "dataMedicao": bson.M{"$gte": dataInicialISO, "$lte": dataFinalISO}} // Limitar data de inicio e data de fim
 
+	// Realiza a consulta no banco de dados e retorna o valor encontrado
 	var diarios []bson.M
 	cur, err := collection.Find(context.Background(), query)
 	if err != nil {
@@ -126,34 +128,27 @@ func getDiarios(w http.ResponseWriter, r *http.Request) {
 	}
 	defer cur.Close(context.Background())
 	for cur.Next(context.Background()) {
-		// To decode into a struct, use cursor.Decode()
 		var result bson.M
 		err := cur.Decode(&result)
 		if err != nil {
 			log.Fatal(err)
 		}
-		// do something with result...
-		fmt.Println(result)
 		diarios = append(diarios, result)
-
-		// To get the raw bson bytes use cursor.Current
-		//raw := cur.Current
-		// do something with raw...
 	}
 	if err := cur.Err(); err != nil {
-		fmt.Println("Localização invalida")
+		fmt.Fprintf(w, "Codigo de estação inválido")
 	} else {
 		json.NewEncoder(w).Encode(diarios)
 	}
 }
 
-// getPrevisoes
+// getPrevisoes retorna os dados de previsão de tempo gerados para uma localidade
 func getPrevisoes(w http.ResponseWriter, r *http.Request) {
 
+	// Recebe os parametros enviados através da requisição HTTP
 	vars := mux.Vars(r)
-	codigoCPTEC := vars["codigoCPTEC"]
-	dataInicial := vars["dataInicial"]
-	dataFinal := vars["dataFinal"]
+	codigoINMET := vars["codigoINMET"]
+	dataAtual := vars["dataAtual"]
 
 	// Conexão com o banco de dados
 	dataBaseURI := "mongodb://127.0.0.1:27017"
@@ -161,28 +156,20 @@ func getPrevisoes(w http.ResponseWriter, r *http.Request) {
 	collection := mongoClient.Database("gdsudao").Collection("previsoes")
 	defer mongoapi.CloseConnection(*mongoClient)
 
-	//consulta := "{"localizacao.coordenadas": {"$near":{"$geometry":{"type": "Point", "coordinates": [-54.013292, -31.347801]}}}}"
-	//query := bson.M{"codigoINMET": codigoEstacao} Nao é o mesmo codigo de uma estacao automatica
-
-	// {dataPrevisao: {"$gte": ISODate('2020-09-17T00:00:00.000Z')}}
-
-	//query := bson.M{"codCPTEC": codigoCPTEC} // Limitar data de inicio e data de fim
-
 	// Conversao das datas para o formato ISO
 	layoutISO := "2006-01-02"
-	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
-	dataFinalISO, _ := time.Parse(layoutISO, dataFinal)
+	data, _ := time.Parse(layoutISO, dataAtual)
 
-	findOptions := options.Find()
-	findOptions.SetSort(bson.M{"dataAtualizacao": -1})
-	query := bson.M{"codCPTEC": codigoCPTEC, "dataPrevisao": bson.M{"$gte": dataInicialISO, "$lte": dataFinalISO}} // Limitar data de inicio e data de fim
+	// Consulta do banco de dados
+	query := bson.M{"codINMET": codigoINMET, "dataAtualizacao": data}
 
 	var previsoes []bson.M
-	cur, err := collection.Find(context.Background(), query, findOptions)
+	cur, err := collection.Find(context.Background(), query)
 	if err != nil {
 		log.Fatal(err)
 	}
-	ultimaData := "0000"
+
+	// Realiza a consulta no banco de dados e retorna o valor encontrado
 	defer cur.Close(context.Background())
 	for cur.Next(context.Background()) {
 		// To decode into a struct, use cursor.Decode()
@@ -191,44 +178,31 @@ func getPrevisoes(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			//log.Fatal(err)
 		}
-
-		p := previsao["dataAtualizacao"]
-		dataAtual := fmt.Sprintf("%v", p)
-
-		// Não esta correto!
-		if ultimaData != dataAtual {
-			ultimaData = dataAtual
-			fmt.Println(previsao)
-			previsoes = append(previsoes, previsao)
-		}
-
-		// To get the raw bson bytes use cursor.Current
-		//raw := cur.Current
-		// do something with raw...
+		previsoes = append(previsoes, previsao)
 	}
 	if err := cur.Err(); err != nil {
-		fmt.Println("Localização invalida")
+		fmt.Fprintf(w, "Codigo de localidade inválido")
 	} else {
 		json.NewEncoder(w).Encode(previsoes)
 	}
 
 }
 
-//	Trata das requisições (mapeia a requisição para a função adequada)
+//	handleRequests trata das requisições (mapeia a requisição para a função adequada)
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/estacao/maisproxima/{latitude}/{longitude}", getNearStation).Methods("GET")
 	myRouter.HandleFunc("/normais/{nomeEstacao}", getNormais).Methods("GET")
 	myRouter.HandleFunc("/diarios/{codigoINMET}/{dataInicial}/{dataFinal}", getDiarios).Methods("GET")
-	myRouter.HandleFunc("/previsoes/{codigoCPTEC}/{dataInicial}/{dataFinal}", getPrevisoes).Methods("GET")
+	myRouter.HandleFunc("/previsoes/{codigoINMET}/{dataAtual}", getPrevisoes).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8082", myRouter))
 }
 
-//	Função Principal do programa
+//	main é função Principal do programa
 func main() {
-	fmt.Println("API: on")
-	defer fmt.Println("API: off")
+	fmt.Println("GDSudão API: on")
+	defer fmt.Println("GDSudão API: off")
 	handleRequests()
 }
