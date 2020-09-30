@@ -1,10 +1,6 @@
-package com.example.gdsudao
+package com.example.gdsudao.model
 
-class Localizacao (
-    var coordenadas: List<Float>
-)
-
-class Estacao (
+data class Estacao (
     var _id: String,
     var altitude: Float,
     var codigoCPTEC: String,

@@ -1,4 +1,4 @@
-package com.example.gdsudao
+package com.example.gdsudao.model
 
 class Normal (
     var _id: String,
