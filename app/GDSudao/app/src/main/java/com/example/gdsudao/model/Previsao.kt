@@ -1,6 +1,6 @@
 package com.example.gdsudao.model
 
-class Previsao (
+data class Previsao (
     var _id: String,
     var clima: String,
     var codCPTEC: String,

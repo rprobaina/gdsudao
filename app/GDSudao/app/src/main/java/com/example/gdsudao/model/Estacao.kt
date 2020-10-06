@@ -10,3 +10,4 @@ data class Estacao (
     var tipoEstacao: String,
     var uf: String
 )
+

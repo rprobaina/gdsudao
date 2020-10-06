@@ -1,6 +1,6 @@
 package com.example.gdsudao.model
 
-class Normal (
+data class Normal (
     var _id: String,
     var codigoINMET: String,
     var nomeEstacao: String,

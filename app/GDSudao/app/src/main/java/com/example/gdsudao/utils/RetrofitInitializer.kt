@@ -1,4 +1,4 @@
-package com.example.gdsudao
+package com.example.gdsudao.utils
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -11,9 +11,7 @@ class RetrofitInitializer {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-
-
-    fun estacaoService(): EstacaoService {
-        return retrofit.create(EstacaoService::class.java)
+    fun apiService(): APIService {
+        return retrofit.create(APIService::class.java)
     }
 }

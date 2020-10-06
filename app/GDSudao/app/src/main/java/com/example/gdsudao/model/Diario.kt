@@ -1,6 +1,6 @@
 package com.example.gdsudao.model
 
-class Diario(
+data class Diario(
     var _id: String,
     var codigoCPTEC: String,
     var codigoINMET: String,
