@@ -55,6 +55,13 @@
             android:layout_height="wrap_content"
             android:text="Area de Plantio:" />
 
+        <EditText
+            android:id="@+id/ptLocalizacao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,13 +80,14 @@
                     android:text="Latitude" />
 
                 <EditText
-                    android:id="@+id/editTextTextPersonName3"
+                    android:id="@+id/ptLatitude"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:hint="23.33"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:text="-54.013292" />
 
             </LinearLayout>
 
@@ -96,23 +104,32 @@
                     android:text="Longitude" />
 
                 <EditText
-                    android:id="@+id/editTextTextPersonName4"
+                    android:id="@+id/ptLongitude"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
                     android:hint="55.33"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:text="-31.347801" />
+
             </LinearLayout>
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/btnBuscarPorCoordenadas"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Buscar por coordenadas" />
+
+            <Button
+                android:id="@+id/btnUsarLocalizacaoAtual"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Usar localização atual" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/btnEscolherDoMapa"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Escolher ponto no mapa" />
@@ -121,7 +138,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/btnCadastrarArea"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Cadastrar Area"

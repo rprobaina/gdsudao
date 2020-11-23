@@ -11,6 +11,8 @@ import com.example.gdsudao.R
 import com.example.gdsudao.adapter.AreaAdapter
 import com.example.gdsudao.model.*
 import com.example.gdsudao.utils.RetrofitInitializer
+import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_cadastro_area.*
 import kotlinx.android.synthetic.main.activity_menu.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -66,32 +68,17 @@ class MenuActivity : AppCompatActivity() {
         }
 
 
-    }
 
 
 
-    fun getStation(latitude: String, longitude: String){
 
 
-        val requestCall = RetrofitInitializer().apiService().getEstacao(latitude, longitude)
 
-        requestCall.enqueue(object : Callback<Estacao> {
-
-            override fun onResponse(call: Call<Estacao>, response: Response<Estacao>) {
-                if (response.isSuccessful) {
-                    var estacao = response.body()
-                    Toast.makeText(this@MenuActivity, "" + estacao, Toast.LENGTH_LONG).show()
-                }else{
-                    Toast.makeText(this@MenuActivity, "ERRO", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<Estacao>?, t: Throwable?) {
-                Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
-            }
-        })
 
     }
+
+
+
 
 
     fun getNormais(nomeEstacao: String){
