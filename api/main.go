@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"mongoapi"
@@ -213,6 +214,41 @@ func somaTermica(gdSlice []float64) float64 {
 	return somaTermica
 }
 
+func getNormal(data string, normais bson.M) float64 {
+	var normal float64
+
+	switch data {
+	case "January":
+		normal = normais["normalJaneiro"].(float64)
+	case "February":
+		normal = normais["normalFevereiro"].(float64)
+	case "March":
+		normal = normais["normalMarco"].(float64)
+	case "April":
+		normal = normais["normalAbril"].(float64)
+	case "May":
+		normal = normais["normalMaio"].(float64)
+	case "June":
+		normal = normais["normalJunho"].(float64)
+	case "July":
+		normal = normais["normalJulho"].(float64)
+	case "August":
+		normal = normais["normalAgosto"].(float64)
+	case "September":
+		normal = normais["normalSetembro"].(float64)
+	case "October":
+		normal = normais["normalOutubro"].(float64)
+	case "November":
+		normal = normais["normalNovembro"].(float64)
+	case "December":
+		normal = normais["normalDezembro"].(float64)
+	default:
+		normal = 0.0
+	}
+
+	return normal
+}
+
 // getDiarios retorna os dados de medições diárias coletados por uma estação meteorológica
 func getGrausDia(w http.ResponseWriter, r *http.Request) {
 
@@ -236,12 +272,41 @@ func getGrausDia(w http.ResponseWriter, r *http.Request) {
 	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
 	dataFinalISO, _ := time.Parse(layoutISO, dataFinal)
 	dataFinalISO = dataFinalISO.AddDate(0, 0, 1)
+	dataHoje := time.Now()
+	dataDiarios := dataHoje.AddDate(0, 0, -2)
+	dataPrevisoes := dataHoje.AddDate(0, 0, 14)
 
 	// Cria o slice de datas
 	var gds []gd
 	for currentDate := dataInicialISO; currentDate != dataFinalISO; currentDate = currentDate.AddDate(0, 0, 1) {
 		gd := gd{currentDate, 0, "nil", false}
 		gds = append(gds, gd)
+	}
+
+	// Tentar previsoes
+	//fmt.Fprintf(w, "Erro")
+	//fmt.Println("Nao achou em previsoes")
+	// *** Pegando dado de NORMAIS ***
+	// Codigo INMET não bate pq as normais sao com estacoes manuais
+	var normais bson.M
+	queryEstacao := bson.M{"codigoINMET": codigoINMET}
+	//fmt.Println(codigoINMET)
+	var estacao bson.M
+	err := collectionEstacoes.FindOne(context.TODO(), queryEstacao).Decode(&estacao)
+	//fmt.Println(codigoINMET)
+	//fmt.Println(estacao)
+	if err != nil {
+		// Erro ao buscar estacoes
+		//fmt.Println("Estacao para normais nao encontarada")
+		fmt.Println(err)
+	} else {
+		nomeEstacao := estacao["nomeEstacao"].(string)
+		queryNormais := bson.M{"nomeEstacao": nomeEstacao}
+
+		err := collectionNormais.FindOne(context.TODO(), queryNormais).Decode(&normais)
+		if err != nil {
+			normais = nil
+		}
 	}
 
 	for p, x := range gds {
@@ -260,50 +325,55 @@ func getGrausDia(w http.ResponseWriter, r *http.Request) {
 		// Buscar dados diários
 		//max, min, err getDiario(data)
 		// Consulta do banco de dados
-		queryDiarios := bson.M{"codigoINMET": codigoINMET, "dataMedicao": x.data}
 		var diario bson.M
-		err := collectionDiarios.FindOne(context.TODO(), queryDiarios).Decode(&diario)
+		var err error = nil
+		//Otimizacao
+		if x.data.After(dataDiarios) {
+			err = errors.New("otimizacao")
+		} else {
+			//fmt.Println("deveria pular")
+			//fmt.Println(x.data.Format(layoutISO))
+			//fmt.Println(dataHoje.Format(layoutISO))
+			queryDiarios := bson.M{"codigoINMET": codigoINMET, "dataMedicao": x.data}
+			err = collectionDiarios.FindOne(context.TODO(), queryDiarios).Decode(&diario)
+		}
 
 		if err != nil {
 			// Tentar previsoes
-			fmt.Fprintf(w, "Erro")
-			fmt.Println("Nao achou diarios	" + x.data.Format(layoutISO))
+			//fmt.Fprintf(w, "Erro")
+			//fmt.Println("Nao achou diarios	" + x.data.Format(layoutISO) + x.data.Month().String())
 			//findOptions := options.Find()
-			queryOptions := options.FindOneOptions{}
-			queryOptions.SetSort(bson.M{"dataAtualizacao": -1, "last_error_time": 1})
-			//findOptions.SetSort(bson.D{{"dataAtualizacao", -1}})
-			queryPrevisoes := bson.M{"codINMET": codigoINMET, "dataPrevisao": x.data}
+
+			err = nil
 			var previsao bson.M
-			err := collectionPrevisoes.FindOne(context.TODO(), queryPrevisoes, &queryOptions).Decode(&previsao)
+			//Otimizacao
+			if x.data.After(dataPrevisoes) {
+				err = errors.New("otimizacao")
+			} else {
+				//fmt.Println("deveria pular")
+				//fmt.Println(x.data.Format(layoutISO))
+				//fmt.Println(dataHoje.Format(layoutISO))
+				queryOptions := options.FindOneOptions{}
+				queryOptions.SetSort(bson.M{"dataAtualizacao": -1, "last_error_time": 1})
+				//findOptions.SetSort(bson.D{{"dataAtualizacao", -1}})
+				queryPrevisoes := bson.M{"codINMET": codigoINMET, "dataPrevisao": x.data}
+				err = collectionPrevisoes.FindOne(context.TODO(), queryPrevisoes, &queryOptions).Decode(&previsao)
+			}
 			if err != nil {
-				// Tentar previsoes
-				fmt.Fprintf(w, "Erro")
-				fmt.Println("Nao achou em previsoes")
-				// *** Pegando dado de NORMAIS ***
-				// Codigo INMET não bate pq as normais sao com estacoes manuais
-				queryEstacao := bson.M{"codigoINMET": codigoINMET}
-				fmt.Println(codigoINMET)
-				var estacao bson.M
-				err := collectionEstacoes.FindOne(context.TODO(), queryEstacao).Decode(&estacao)
-				fmt.Println(codigoINMET)
-				fmt.Println(estacao)
-				if err != nil {
-					// Erro ao buscar estacoes
-					fmt.Println("Estacao para normais nao encontarada")
-					fmt.Println(err)
+
+				if normais == nil {
+					// Erro ao buscar normais
 				} else {
-					nomeEstacao := estacao["nomeEstacao"].(string)
-					queryNormais := bson.M{"nomeEstacao": nomeEstacao}
-					var normais bson.M
-					err := collectionNormais.FindOne(context.TODO(), queryNormais).Decode(&normais)
-					if err != nil {
-						// Erro ao buscar normais
-					} else {
-						// TODO: calcular o retorno das normais. Talvezes colocar num mapa ou fazer uma função
-						fmt.Println(normais)
-					}
-					// Buscar normais
+					// TODO: calcular o retorno das normais. Talvezes colocar num mapa ou fazer uma função
+					//fmt.Println(normais)
+					//data :=
+					normal := getNormal(x.data.Month().String(), normais)
+					//fmt.Println(normal)
+					tmin = normal
+					tmax = normal
+					fonte = "normal"
 				}
+				// Buscar normais
 
 			} else {
 				// *** Pegando dado de PREVISAO ***
@@ -311,8 +381,8 @@ func getGrausDia(w http.ResponseWriter, r *http.Request) {
 				tmax = previsao["temperaturaMaxima"].(float64)
 				fonte = "previsao"
 				// Debug
-				fmt.Println("Data: " + x.data.Format(layoutISO) + " | Temperatura Minima: " + fmt.Sprintf("%f", tmin) +
-					" | Temperatura Maxima: " + fmt.Sprintf("%f", tmax) + " | Fonte: " + fonte)
+				//fmt.Println("Data: " + x.data.Format(layoutISO) + " | Temperatura Minima: " + fmt.Sprintf("%f", tmin) +
+				//	" | Temperatura Maxima: " + fmt.Sprintf("%f", tmax) + " | Fonte: " + fonte)
 				// Atualiza o vetor de graus dia
 				//fmt.Println("Previsoes")
 				//fmt.Println(previsao)
@@ -324,8 +394,8 @@ func getGrausDia(w http.ResponseWriter, r *http.Request) {
 			tmax = diario["temperaturaMaxima"].(float64)
 			fonte = "diario"
 			// Debug
-			fmt.Println("Data: " + x.data.Format(layoutISO) + " | Temperatura Minima: " + fmt.Sprintf("%f", tmin) +
-				" | Temperatura Maxima: " + fmt.Sprintf("%f", tmax) + " | Fonte: " + fonte)
+			//fmt.Println("Data: " + x.data.Format(layoutISO) + " | Temperatura Minima: " + fmt.Sprintf("%f", tmin) +
+			//	" | Temperatura Maxima: " + fmt.Sprintf("%f", tmax) + " | Fonte: " + fonte)
 
 		}
 		// Atualiza o vetor de graus dia
@@ -340,45 +410,42 @@ func getGrausDia(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	//fmt.Println("+++++++++++++++++++++++++++++++++++++")
-	fmt.Println(gds)
+	//fmt.Println(gds)
+	var st = 0.0
+	var qDia = 0.0
+	var qPre = 0.0
+	var qNor = 0.0
+	var qTot = 0.0
+	fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
+	for i, g := range gds {
+		fmt.Printf("Item: %d \t Data: %s \t Graus-dia: %f \t Fonte: %s \t Done: %t\n", i, g.data.Format(layoutISO), g.gd, g.fonte, g.done)
+		if g.done {
+			st += g.gd
+			switch g.fonte {
+			case "diario":
+				qDia++
+			case "previsao":
+				qPre++
+			case "normal":
+				qNor++
+			}
+			qTot++
+		} else {
+			fmt.Println("Algum dado nao foi encontrado")
+		}
+
+	}
+	fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
+	fmt.Printf("Intervalo: %s - %s \t Soma Termica: %f (graus dia) \t Diários: %f%% \t Previsões: %f%% \t Normais: %f%% \n", dataInicial, dataFinal, st, ((qDia / qTot) * 100), ((qPre / qTot) * 100), ((qNor / qTot) * 100))
 
 	/*
 		TODO: validar dados, calcular graus dia em gds, retornar valor e percentuais
 	*/
 
-	// V NADA PRESTA
-	//----------------
-	// Consulta do banco de dados
-	queryDiarios := bson.M{"codigoINMET": codigoINMET, "dataMedicao": bson.M{"$gt": dataInicialISO, "$lte": dataFinalISO}} // Limitar data de inicio e data de fim
-
-	// Realiza a consulta no banco de dados e retorna o valor encontrado
-	var diarios []bson.M
-	var gdSlice []float64
-	cur, err := collectionDiarios.Find(context.Background(), queryDiarios)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(context.Background())
-	for cur.Next(context.Background()) {
-		var result bson.M
-		err := cur.Decode(&result)
-		if err != nil {
-			log.Fatal(err)
-		}
-		diarios = append(diarios, result)
-		tMin := result["temperaturaMinima"]
-		tMax := result["temperaturaMaxima"]
-
-		gd := calcularGrausDia(tMin.(float64), tMax.(float64))
-
-		gdSlice = append(gdSlice, gd)
-	}
-	somaTermica := somaTermica(gdSlice)
-
-	if err := cur.Err(); err != nil {
+	if gds == nil {
 		fmt.Fprintf(w, "Codigo de estação inválido")
 	} else {
-		json.NewEncoder(w).Encode(somaTermica)
+		//json.NewEncoder(w).Encode(gds)
 	}
 
 }
