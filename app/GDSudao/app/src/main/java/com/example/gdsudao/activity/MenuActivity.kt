@@ -23,6 +23,8 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
+        setSupportActionBar(findViewById(R.id.toolbarMenu))
+
         //getStation("-54.013292", "-31.347801") ok
         //getNormais("BAGE") ok
         //getDiarios("A827","2020-09-10", "2020-09-15") ok
@@ -31,7 +33,7 @@ class MenuActivity : AppCompatActivity() {
         //** Recycler view **//
 
         // Configurar adapter
-
+        /*
         val areas = listOf(
             Area("p20", "10/10/2000", "10/10/2000", 1, 100.0f),
             Area("p20 - Talhão 2 ", "10/10/2000", "10/10/2000", 2, 50.0f),
@@ -47,8 +49,11 @@ class MenuActivity : AppCompatActivity() {
             Area("Embrapa", "10/10/2000", "10/10/2000", 2, 10.5f)
         )
 
+        */
 
-
+        //var areas = listOf(Area("teste", "teste"))
+        var sp = com.example.gdsudao.utils.SharedPreferences()
+        var areas = sp.RecuperarListaAreas(this)
         recyclerViewAreas.apply {
             layoutManager = LinearLayoutManager(this@MenuActivity)
             adapter = AreaAdapter(areas)

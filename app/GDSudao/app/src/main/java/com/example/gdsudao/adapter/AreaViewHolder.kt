@@ -27,10 +27,10 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
 
     fun bind(area: Area){
         tvNome?.text = area.nome
-        tvDataPlantio?.text = "Data Plantio: " + area.dataPlantio
-        tvDataPrevisao?.text = "Próximo Corte: " + area.dataEstimada
-        tvNumeroCortes?.text = "Número de cortes: " + area.numeroCortes
-        tvProgresso?.text = "Data Plantio: " + area.progresso + "%"
+        tvDataPlantio?.text = "Data Plantio: " + area.dataCorte
+        //tvDataPrevisao?.text = "Próximo Corte: " + area.dataEstimada
+        //tvNumeroCortes?.text = "Número de cortes: " + area.numeroCortes
+        //tvProgresso?.text = "Data Plantio: " + area.progresso + "%"
 
         /*
         Implementar o esquema da figura

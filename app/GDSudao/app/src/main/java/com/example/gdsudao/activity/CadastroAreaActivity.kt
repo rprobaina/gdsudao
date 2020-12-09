@@ -1,6 +1,7 @@
 package com.example.gdsudao.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Location
@@ -12,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.gdsudao.R
+import com.example.gdsudao.model.Area
 import com.example.gdsudao.model.Estacao
 import com.example.gdsudao.model.Localizacao
 import com.example.gdsudao.utils.RetrofitInitializer
@@ -30,11 +32,13 @@ class CadastroAreaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cadastro_area)
 
+        setSupportActionBar(findViewById(R.id.toolbarCadastroArea))
 
+        /*
         var estacao : Estacao
 
-        var latitude = ptLatitude.text.toString()
-        var longitude = ptLongitude.text.toString()
+        //var latitude = ptLatitude.text.toString()
+        //var longitude = ptLongitude.text.toString()
 
         Toast.makeText(this@CadastroAreaActivity, "" + latitude + " - " + longitude, Toast.LENGTH_LONG).show()
 
@@ -92,10 +96,37 @@ class CadastroAreaActivity : AppCompatActivity() {
         }
 
 
+*/
+        btnAddLocalizacao.setOnClickListener {
+            var nomeArea = etNomeArea.text.toString()
+            var dataCorte = etDataUltimoCorte.text.toString()
+            //var numeroCortes = etNumeroCortes.text
+            // var latitude = etLatitude.text
+            //var longitude = etLongitude.text
 
-        btnUsarLocalizacaoAtual.setOnClickListener {
+            var intent = Intent(this, MenuActivity::class.java)
+            intent.putExtra("nomeArea", nomeArea)
+            intent.putExtra("dataCorte", dataCorte)
+            //intent.putExtra("numeroCortes", numeroCortes)
+            // intent.putExtra("latitude", latitude)
+            // intent.putExtra("longitude", longitude)
 
+            // Salvar na fila de areas
+
+            var area = Area(nomeArea, dataCorte)
+
+            var sp = com.example.gdsudao.utils.SharedPreferences()
+            sp.SalvarAreaLista(this, area)
         }
 
+
+        btnCadastrarAreas.setOnClickListener {
+
+            var sp = com.example.gdsudao.utils.SharedPreferences()
+            var areas = sp.RecuperarListaAreas(this)
+
+            //Toast.makeText(this, areas.toString(), Toast.LENGTH_SHORT).show()
+            // startActivity(intent)
+        }
     }
 }

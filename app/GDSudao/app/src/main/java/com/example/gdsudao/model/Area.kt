@@ -2,10 +2,16 @@ package com.example.gdsudao.model
 
 data class Area (
     var nome : String,
-    var dataPlantio : String,
-    var dataEstimada : String,
-    var numeroCortes : Int,
-    var progresso : Float
-    //var estacao: Estacao,
-    //var normais: Normal
+    var dataCorte : String
+    /*
+    var numeroCortes : Int
+    var latitude : Float,
+    var longitude : Float,
+    var codigoEstacao: String,
+    var stAtual: Float,
+    var diario: Float,
+    var previsao: Float,
+    var normal: Float
+
+     */
 )
