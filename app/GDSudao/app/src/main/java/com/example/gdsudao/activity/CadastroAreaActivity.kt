@@ -34,99 +34,61 @@ class CadastroAreaActivity : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.toolbarCadastroArea))
 
-        /*
-        var estacao : Estacao
-
-        //var latitude = ptLatitude.text.toString()
-        //var longitude = ptLongitude.text.toString()
-
-        Toast.makeText(this@CadastroAreaActivity, "" + latitude + " - " + longitude, Toast.LENGTH_LONG).show()
-
-        btnBuscarPorCoordenadas.setOnClickListener {
-                // Buscando por coordenadas
-                val requestCall = RetrofitInitializer().apiService().getEstacao(latitude, longitude)
-
-                var localizacao = listOf<Float>(latitude.toFloat(), longitude.toFloat())
-
-                requestCall.enqueue(object : Callback<Estacao> {
-
-                    override fun onResponse(call: Call<Estacao>, response: Response<Estacao>) {
-                        if (response.isSuccessful) {
-                            estacao = Estacao(
-                                response.body()._id.toString(),
-                                response.body().altitude?.toFloat(),
-                                response.body().codigoCPTEC.toString(),
-                                response.body().codigoINMET.toString(),
-                                Localizacao(localizacao),
-                                response.body().nomeEstacao.toString(),
-                                response.body().tipoEstacao.toString(),
-                                response.body().uf.toString()
-                            )
-                            var nomeDaLocalizacao = estacao.nomeEstacao
-                            ptLocalizacao.setText(nomeDaLocalizacao)
-
-                            // TODO: salvar estacao
-                            var sharedPreferences = getSharedPreferences("gdsudao", MODE_PRIVATE)
-                            //var gson = Gson()
-                            //var json = gson.toJson(estacao);
-                            sharedPreferences.edit().putString("nome", "Ricardo")
-                            sharedPreferences.edit().commit()
-
-                            /* TODO Testar ^^, recuperando dados
-                            var sharedPreferences = getSharedPreferences("gdsudao", MODE_PRIVATE)
-                            var gson = Gson()
-                            var jsonG : String? = sharedPreferences.getString("estacao", " ")
-                            Toast.makeText(this@CadastroAreaActivity, "" + jsonG, Toast.LENGTH_SHORT).show()
-                            var estacao : Estacao = gson.fromJson(jsonG, Estacao::class.java)
-                            Toast.makeText(this@CadastroAreaActivity, "" + estacao, Toast.LENGTH_SHORT).show()
-                            */
-
-                            Toast.makeText(this@CadastroAreaActivity, "" + estacao, Toast.LENGTH_LONG).show()
-                        }else{
-                            Toast.makeText(this@CadastroAreaActivity, "ERRO", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<Estacao>?, t: Throwable?) {
-                        Toast.makeText(this@CadastroAreaActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
-                    }
-                })
+        // so para remover a cagada
+        //var sp = com.example.gdsudao.utils.SharedPreferences()
+        //sp.RemoverAllAreaLista(this)
 
 
-        }
-
-
-*/
         btnAddLocalizacao.setOnClickListener {
-            var nomeArea = etNomeArea.text.toString()
-            var dataCorte = etDataUltimoCorte.text.toString()
-            //var numeroCortes = etNumeroCortes.text
-            // var latitude = etLatitude.text
-            //var longitude = etLongitude.text
-
-            var intent = Intent(this, MenuActivity::class.java)
-            intent.putExtra("nomeArea", nomeArea)
-            intent.putExtra("dataCorte", dataCorte)
-            //intent.putExtra("numeroCortes", numeroCortes)
-            // intent.putExtra("latitude", latitude)
-            // intent.putExtra("longitude", longitude)
-
-            // Salvar na fila de areas
-
-            var area = Area(nomeArea, dataCorte)
-
             var sp = com.example.gdsudao.utils.SharedPreferences()
-            sp.SalvarAreaLista(this, area)
+            sp.RemoverAllAreaLista(this)
         }
 
 
         btnCadastrarAreas.setOnClickListener {
 
             var sp = com.example.gdsudao.utils.SharedPreferences()
-            var areas = sp.RecuperarListaAreas(this)
+            var nomeArea = etNomeArea.text.toString()
+            var dataCorte = etDataUltimoCorte.text.toString()
+            var numeroCortes = etNumeroCortes.text.toString()
+            var latitude = etLatitude.text.toString()
+            var longitude = etLongitude.text.toString()
 
-            //Toast.makeText(this, areas.toString(), Toast.LENGTH_SHORT).show()
-            // startActivity(intent)
+
+            //intent.putExtra("nomeArea", nomeArea)
+            //intent.putExtra("dataCorte", dataCorte)
+            //intent.putExtra("numeroCortes", numeroCortes)
+            // intent.putExtra("latitude", latitude)
+            // intent.putExtra("longitude", longitude)
+
+            // Salvar na fila de areas
+
+            var intent = Intent(this, MenuActivity::class.java)
+            var area = Area(nomeArea, dataCorte, numeroCortes, latitude, longitude, "", "", "", "", "", "")
+
+            // Consultar estacao
+            val requestCall = RetrofitInitializer().apiService().getEstacao(latitude, longitude)
+            requestCall.enqueue(object : Callback<Estacao> {
+
+                override fun onResponse(call: Call<Estacao>, response: Response<Estacao>) {
+                    if (response.isSuccessful) {
+                        var codigoINMET = response.body().codigoINMET.toString()
+                        area.codigoEstacao = codigoINMET
+                        Toast.makeText(applicationContext, codigoINMET, Toast.LENGTH_LONG).show()
+                        sp.SalvarAreaLista(applicationContext, area)
+
+                        startActivity(intent)
+                    }else{
+                        //TODO
+                    }
+                }
+
+                override fun onFailure(call: Call<Estacao>?, t: Throwable?) {
+                    Toast.makeText(this@CadastroAreaActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                }
+            })
+
+
         }
     }
 }

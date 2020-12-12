@@ -1,9 +1,6 @@
 package com.example.gdsudao.utils
 
-import com.example.gdsudao.model.Diario
-import com.example.gdsudao.model.Estacao
-import com.example.gdsudao.model.Normal
-import com.example.gdsudao.model.Previsao
+import com.example.gdsudao.model.*
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -24,4 +21,8 @@ interface APIService {
     // Retorna os dados de previsao do tempo
     @GET("/previsoes/{codigoINMET}/{dataInicial}")
     fun getPrevisoes(@Path("codigoINMET") codigoINMET: String, @Path("dataInicial") dataInicial: String): retrofit2.Call<List<Previsao>>
+
+    // Retorna os dados de previsao do tempo
+    @GET("/gdsudaoProximoCorte/{codigoINMET}/{dataCorte}/{numeroCorte}")
+    fun attArea(@Path("codigoINMET") codigoEstcao: String, @Path("dataCorte") dataCorte: String, @Path("numeroCorte") numeroCorte: String):  retrofit2.Call<Area>
 }

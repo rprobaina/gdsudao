@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.gdsudao.model.Area
 import com.google.gson.Gson
+import java.lang.Exception
 import com.google.gson.reflect.TypeToken as TypeToken
 
 class SharedPreferences {
@@ -20,6 +21,18 @@ class SharedPreferences {
         var prefEditor = pref.edit()
         var gson = Gson()
         var json = gson.toJson(listaAreas)
+
+        prefEditor.putString("area", json)
+        prefEditor.commit()
+    }
+
+    fun RemoverAllAreaLista(context: Context){
+        var listaAreas = RecuperarListaAreas(context)
+
+        var pref = context.getSharedPreferences("GDSUDAO_PREFERENCIAS", Context.MODE_PRIVATE)
+        var prefEditor = pref.edit()
+
+        var json = ""
 
         prefEditor.putString("area", json)
         prefEditor.commit()
@@ -42,16 +55,18 @@ class SharedPreferences {
     }
 
     fun RecuperarListaAreas(context: Context): ArrayList<Area> {
-        var listaAreas = ArrayList<Area>()
+        var listaAreas : ArrayList<Area> = ArrayList()
         var pref = context.getSharedPreferences("GDSUDAO_PREFERENCIAS", Context.MODE_PRIVATE)
         var gson = Gson()
         var json = pref.getString("area", "")
 
-        val tipo = object : TypeToken<List<Area>>() {}.type
-        listaAreas = gson.fromJson(json, tipo)
+        try {
+            val tipo = object : TypeToken<List<Area>>() {}.type
+            listaAreas = gson.fromJson(json, tipo)
+            Log.println(Log.DEBUG, "SHARED", listaAreas.toString())
+        }catch (e: Exception){
 
-        Log.println(Log.DEBUG, "SHARED", listaAreas.toString())
-
+        }
 
         //Toast.makeText(context, json.toString(), Toast.LENGTH_SHORT).show()
         return listaAreas

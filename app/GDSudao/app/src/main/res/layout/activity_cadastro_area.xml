@@ -74,11 +74,11 @@
 
         <EditText
             android:id="@+id/etDataUltimoCorte"
+            style="@style/Base.Widget.MaterialComponents.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Digite a data de plantio ou do último corte"
-            android:inputType="date" />
+            android:hint="Digite a data de plantio ou do último corte" />
 
         <TextView
             android:id="@+id/textView3"
@@ -117,7 +117,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Latitude"
-                android:inputType="numberSigned" />
+                android:text="-54.013292" />
 
             <EditText
                 android:id="@+id/etLongitude"
@@ -126,7 +126,7 @@
                 android:layout_weight="1"
                 android:ems="10"
                 android:hint="Longitude"
-                android:inputType="numberSigned" />
+                android:text="-31.347801" />
 
         </LinearLayout>
 

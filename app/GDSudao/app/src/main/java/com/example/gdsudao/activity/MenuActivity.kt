@@ -19,46 +19,58 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MenuActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu)
 
         setSupportActionBar(findViewById(R.id.toolbarMenu))
 
-        //getStation("-54.013292", "-31.347801") ok
-        //getNormais("BAGE") ok
-        //getDiarios("A827","2020-09-10", "2020-09-15") ok
-        //getPrevisoes("A827","2020-09-30") ok
-
-        //** Recycler view **//
-
-        // Configurar adapter
-        /*
-        val areas = listOf(
-            Area("p20", "10/10/2000", "10/10/2000", 1, 100.0f),
-            Area("p20 - Talhão 2 ", "10/10/2000", "10/10/2000", 2, 50.0f),
-            Area("Aceguá 1", "10/10/2000", "10/10/2000", 4, 69.0f),
-            Area("Embrapa", "10/10/2000", "10/10/2000", 2, 10.5f),
-            Area("p20", "10/10/2000", "10/10/2000", 1, 100.0f),
-            Area("p20 - Talhão 2 ", "10/10/2000", "10/10/2000", 2, 50.0f),
-            Area("Aceguá 1", "10/10/2000", "10/10/2000", 4, 69.0f),
-            Area("Embrapa", "10/10/2000", "10/10/2000", 2, 10.5f),
-            Area("p20", "10/10/2000", "10/10/2000", 1, 100.0f),
-            Area("p20 - Talhão 2 ", "10/10/2000", "10/10/2000", 2, 50.0f),
-            Area("Aceguá 1", "10/10/2000", "10/10/2000", 4, 69.0f),
-            Area("Embrapa", "10/10/2000", "10/10/2000", 2, 10.5f)
-        )
-
-        */
 
         //var areas = listOf(Area("teste", "teste"))
         var sp = com.example.gdsudao.utils.SharedPreferences()
+        //sp.RemoverAllAreaLista(this) Se eu cadastrar uma are errada liberar isso
         var areas = sp.RecuperarListaAreas(this)
-        recyclerViewAreas.apply {
-            layoutManager = LinearLayoutManager(this@MenuActivity)
-            adapter = AreaAdapter(areas)
-            hasFixedSize()
+
+        if (areas.size > 0) {
+            areas.forEach(){
+                //Toast.makeText(this, it.toString(), Toast.LENGTH_LONG).show()
+                // Consultar estacao
+                val requestCall = RetrofitInitializer().apiService().attArea(it.codigoEstacao, it.dataCorte, it.numeroCorte)
+                //Toast.makeText(this, requestCall.toString(), Toast.LENGTH_SHORT).show()
+                requestCall.enqueue(object : Callback<Area> {
+                    override fun onResponse(call: Call<Area>, response: Response<Area>) {
+                        if (response.isSuccessful) {
+                            var areaResponse = response.body()
+                            Toast.makeText(this@MenuActivity, areaResponse.toString(), Toast.LENGTH_SHORT).show()
+                            it.st = areaResponse.st
+                            it.proxcorte = areaResponse.proxcorte
+                            it.diario = areaResponse.diario
+                            it.previsao = areaResponse.previsao
+                            it.normal = areaResponse.normal
+                            println(it)
+
+                            recyclerViewAreas.apply {
+                                layoutManager = LinearLayoutManager(this@MenuActivity)
+                                adapter = AreaAdapter(areas)
+                                hasFixedSize()
+                            }
+
+                        }else{
+                            //TODO
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Area>?, t: Throwable?) {
+                        //Toast.makeText(this@CadastroAreaActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
         }
+
+
+
+
         /* Configurar o Recyclerviwer
         var viewManager = LinearLayoutManager(this)
         recyclerViewAreas.layoutManager = viewManager
@@ -84,7 +96,9 @@ class MenuActivity : AppCompatActivity() {
 
 
 
+   fun attAreas(areas: ArrayList<Area>) {
 
+   }
 
     fun getNormais(nomeEstacao: String){
 
