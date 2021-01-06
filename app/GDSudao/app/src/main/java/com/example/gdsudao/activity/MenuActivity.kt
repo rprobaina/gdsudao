@@ -29,7 +29,7 @@ class MenuActivity : AppCompatActivity() {
 
         //var areas = listOf(Area("teste", "teste"))
         var sp = com.example.gdsudao.utils.SharedPreferences()
-        //sp.RemoverAllAreaLista(this) Se eu cadastrar uma are errada liberar isso
+        //sp.RemoverAllAreaLista(this) //Se eu cadastrar uma are errada liberar isso
         var areas = sp.RecuperarListaAreas(this)
 
         if (areas.size > 0) {

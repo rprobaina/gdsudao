@@ -40,7 +40,8 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
 
         tvNome?.text = area.nome
         tvDataPlantio?.text = "Data Plantio: " + area.dataCorte
-        tvProxCorte?.text = area.proxcorte.substring(0, 10).replace("-","/", false)
+        //tvProxCorte?.text = area.proxcorte.substring(0, 10).replace("-","/", false)
+        tvProxCorte?.text = area.proxcorte
         tvNumeroCortes?.text = "Número de cortes: " + area.numeroCorte
 
         if (area.diario.length > 5){
@@ -71,7 +72,11 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
             progresso =  (area.st.toFloat() / ST_OUTROS_CORTES ) * 100
         }
 
-        tvProgresso?.text = "Progresso: " + progresso.toString().substring(0, 4) + "%"
+        if (progresso.toString().length > 5) {
+            tvProgresso?.text = "Progresso: " + progresso.toString().substring(0, 4) + "%"
+        }else{
+            tvProgresso?.text = "Progresso: " + progresso.toString() + "%"
+        }
 
 
         /*
