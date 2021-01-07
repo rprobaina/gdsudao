@@ -10,12 +10,10 @@ import android.text.Editable
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.example.gdsudao.MapsActivity
 import com.example.gdsudao.R
 import com.example.gdsudao.model.Area
 import com.example.gdsudao.model.Estacao
 import com.example.gdsudao.utils.RetrofitInitializer
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.activity_cadastro_area.*
 import retrofit2.Call
@@ -25,6 +23,21 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class CadastroAreaActivity : AppCompatActivity() {
+
+    var nomeArea = ""
+    var dataCorte = ""
+    var numeroCortes = ""
+    var latitude = ""
+    var longitude = ""
+
+    override fun onResume() {
+        super.onResume()
+        etNomeArea.text = Editable.Factory.getInstance().newEditable(nomeArea)
+        etDataUltimoCorte.text = Editable.Factory.getInstance().newEditable(dataCorte)
+        etNumeroCortes.text = Editable.Factory.getInstance().newEditable(numeroCortes)
+        etLatitude.text = Editable.Factory.getInstance().newEditable(latitude)
+        etLongitude.text = Editable.Factory.getInstance().newEditable(longitude)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -176,6 +189,13 @@ class CadastroAreaActivity : AppCompatActivity() {
 
 
         btnAddLocalizacaoMAPA.setOnClickListener {
+            //salva dados antes de abrir o mapa
+            nomeArea = etNomeArea.text.toString()
+            dataCorte = etDataUltimoCorte.text.toString()
+            numeroCortes = etNumeroCortes.text.toString()
+            latitude = etLatitude.text.toString()
+            longitude = etLongitude.text.toString()
+
             var intent = Intent(this, MapsActivity::class.java)
             startActivity(intent)
         }

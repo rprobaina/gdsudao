@@ -14,7 +14,6 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
     private var tvProxCorte: TextView? = null
     private var tvNumeroCortes: TextView? = null
     private var tvProgresso: TextView? = null
-    //private var ivIcone: ImageView? = null
     private var tvDiarios: TextView? = null
     private var tvPrevisoes: TextView? = null
     private var tvNormais: TextView? = null
@@ -29,14 +28,11 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         tvDiarios = itemView.findViewById(R.id.tvDiarios)
         tvPrevisoes = itemView.findViewById(R.id.tvPrevisoes)
         tvNormais = itemView.findViewById(R.id.tvNormais)
-        //ivIcone = itemView.findViewById(R.id.ivIconeSudao)
     }
 
     fun bind(area: Area){
         val ST_PRIRO_CORTE = 358.0f
         val ST_OUTROS_CORTES = 281.0f
-
-
 
         tvNome?.text = area.nome
         tvDataPlantio?.text = "Data Plantio: " + area.dataCorte

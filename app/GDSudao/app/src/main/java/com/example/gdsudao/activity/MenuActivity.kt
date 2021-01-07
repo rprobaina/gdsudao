@@ -3,6 +3,7 @@ package com.example.gdsudao.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ListAdapter
 import android.widget.Toast
@@ -31,6 +32,7 @@ class MenuActivity : AppCompatActivity() {
         var sp = com.example.gdsudao.utils.SharedPreferences()
         //sp.RemoverAllAreaLista(this) //Se eu cadastrar uma are errada liberar isso
         var areas = sp.RecuperarListaAreas(this)
+        Log.println(Log.DEBUG, "areas", areas.toString())
 
         if (areas.size > 0) {
             areas.forEach(){
@@ -48,11 +50,13 @@ class MenuActivity : AppCompatActivity() {
                             it.diario = areaResponse.diario
                             it.previsao = areaResponse.previsao
                             it.normal = areaResponse.normal
-                            println(it)
+                            Log.println(Log.DEBUG, "areas", response.toString())
+
+                            // TODO: salvar area atualizada localmente
 
                             recyclerViewAreas.apply {
                                 layoutManager = LinearLayoutManager(this@MenuActivity)
-                                adapter = AreaAdapter(areas)
+                                adapter = AreaAdapter(this@MenuActivity, areas)
                                 hasFixedSize()
                             }
 
@@ -61,8 +65,9 @@ class MenuActivity : AppCompatActivity() {
                         }
                     }
 
+                    // TODO tratar o erro se não não cria a lista
                     override fun onFailure(call: Call<Area>?, t: Throwable?) {
-                        //Toast.makeText(this@CadastroAreaActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                        Log.println(Log.ERROR, "onFailure", "falhou a resposta")
                     }
                 })
             }
