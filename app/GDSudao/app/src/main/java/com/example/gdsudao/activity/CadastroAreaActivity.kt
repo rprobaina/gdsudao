@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.Editable
+import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -210,6 +211,7 @@ class CadastroAreaActivity : AppCompatActivity() {
             etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
         }
 
+        //onOptionsItemSelected(R.layout.detalhes_menu)
     }
 
 

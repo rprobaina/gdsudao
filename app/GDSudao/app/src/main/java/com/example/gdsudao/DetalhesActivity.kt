@@ -3,6 +3,8 @@ package com.example.gdsudao
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_detalhes.*
 
@@ -38,5 +40,16 @@ class DetalhesActivity : AppCompatActivity() {
             Toast.makeText(this, "Erro ao apresentar os detalhes.", Toast.LENGTH_SHORT).show()
         }
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.detalhes_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var id = item.itemId
+        Toast.makeText(this, "${item}", Toast.LENGTH_SHORT).show()
+        return super.onOptionsItemSelected(item)
     }
 }

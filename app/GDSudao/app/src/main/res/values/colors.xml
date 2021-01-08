@@ -5,4 +5,6 @@
     <color name="colorPrimaryLight">#6b88cc</color>
     <color name="colorPrimaryDark">#00326c</color>
     <color name="colorPrimaryText">#ffffff</color>
+    <color name="colorGreeLogo">#4FBA6F</color>
+    <color name="colorGreeLogoDark">#4C8056</color>
 </resources>
