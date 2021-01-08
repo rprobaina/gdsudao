@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,18 @@ class CadastroAreaActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val bundle = intent.extras
+
+        if (bundle != null){
+            nomeArea = bundle?.getString("nA").toString()
+            dataCorte = bundle?.getString("dC").toString()
+            numeroCortes = bundle?.getString("nC").toString()
+            latitude = bundle?.getString("lat").toString()
+            longitude = bundle?.getString("lon").toString()
+            Log.println(Log.DEBUG, "bundle", "${nomeArea} + ${bundle.getString("lon")}")
+        }
+
         etNomeArea.text = Editable.Factory.getInstance().newEditable(nomeArea)
         etDataUltimoCorte.text = Editable.Factory.getInstance().newEditable(dataCorte)
         etNumeroCortes.text = Editable.Factory.getInstance().newEditable(numeroCortes)
@@ -49,6 +62,26 @@ class CadastroAreaActivity : AppCompatActivity() {
         var fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         var dataFmt = ""
+
+
+        val bundle = intent.extras
+
+        if (bundle != null){
+            Log.println(Log.DEBUG, "bundle", "Cadastro area bundle not null ${bundle}")
+            nomeArea = bundle?.getStringArrayList("nA").toString()
+            dataCorte = bundle?.getStringArrayList("dC").toString()
+            numeroCortes = bundle?.getStringArrayList("nC").toString()
+            latitude = bundle?.getStringArrayList("lat").toString()
+            longitude = bundle?.getStringArrayList("lon").toString()
+        }
+
+        etNomeArea.text = Editable.Factory.getInstance().newEditable(nomeArea)
+        etDataUltimoCorte.text = Editable.Factory.getInstance().newEditable(dataCorte)
+        etNumeroCortes.text = Editable.Factory.getInstance().newEditable(numeroCortes)
+        etLatitude.text = Editable.Factory.getInstance().newEditable(latitude)
+        etLongitude.text = Editable.Factory.getInstance().newEditable(longitude)
+
+
         // so para remover a cagada
         //var sp = com.example.gdsudao.utils.SharedPreferences()
         //sp.RemoverAllAreaLista(this)
@@ -198,10 +231,18 @@ class CadastroAreaActivity : AppCompatActivity() {
             longitude = etLongitude.text.toString()
 
             var intent = Intent(this, MapsActivity::class.java)
+
+            intent.putExtra("nA", nomeArea)
+            intent.putExtra("dC", dataCorte)
+            intent.putExtra("nC", numeroCortes)
+            intent.putExtra("lat", latitude)
+            intent.putExtra("lon", longitude)
+
             startActivity(intent)
         }
 
         //Retornando os dados do mapa
+        /*
         val bundle = intent.extras
         val lat = bundle?.getString("lat")
         val lon = bundle?.getString("lon")
@@ -210,7 +251,7 @@ class CadastroAreaActivity : AppCompatActivity() {
             etLatitude.text = Editable.Factory.getInstance().newEditable(lat)
             etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
         }
-
+        */
         //onOptionsItemSelected(R.layout.detalhes_menu)
     }
 
