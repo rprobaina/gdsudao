@@ -44,7 +44,11 @@ class MenuActivity : AppCompatActivity() {
                     override fun onResponse(call: Call<Area>, response: Response<Area>) {
                         if (response.isSuccessful) {
                             var areaResponse = response.body()
-                            Toast.makeText(this@MenuActivity, areaResponse.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MenuActivity,
+                                areaResponse.toString(),
+                                Toast.LENGTH_SHORT
+                            ).show()
                             it.st = areaResponse.st
                             it.proxcorte = areaResponse.proxcorte
                             it.diario = areaResponse.diario
@@ -52,25 +56,36 @@ class MenuActivity : AppCompatActivity() {
                             it.normal = areaResponse.normal
                             Log.println(Log.DEBUG, "areas", response.toString())
 
-                            // TODO: salvar area atualizada localmente
+                            sp.AtualizarAreaLocal(this@MenuActivity, it, areas.indexOf(it))
 
+                            /*
                             recyclerViewAreas.apply {
                                 layoutManager = LinearLayoutManager(this@MenuActivity)
                                 adapter = AreaAdapter(this@MenuActivity, areas)
                                 hasFixedSize()
                             }
 
-                        }else{
+                             */
+                        } else {
                             //TODO
                         }
                     }
 
-                    // TODO tratar o erro se não não cria a lista
+                    // Trata a falha de conexão com a APU
                     override fun onFailure(call: Call<Area>?, t: Throwable?) {
-                        Log.println(Log.ERROR, "onFailure", "falhou a resposta")
+                        Toast.makeText(this@MenuActivity, "Falha de conexão com a API.", Toast.LENGTH_SHORT).show()
                     }
                 })
+
+                // Gera a lista de areas cadastradas
+                recyclerViewAreas.apply {
+                    layoutManager = LinearLayoutManager(this@MenuActivity)
+                    adapter = AreaAdapter(this@MenuActivity, areas)
+                    hasFixedSize()
+                }
             }
+
+
         }
 
 
