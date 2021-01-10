@@ -1,14 +1,21 @@
 package com.example.gdsudao
 
+import android.app.DatePickerDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.example.gdsudao.activity.MenuActivity
+import kotlinx.android.synthetic.main.activity_cadastro_area.*
 import kotlinx.android.synthetic.main.activity_detalhes.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DetalhesActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalhes)
@@ -17,9 +24,8 @@ class DetalhesActivity : AppCompatActivity() {
 
         // Get the areas
         var sp = com.example.gdsudao.utils.SharedPreferences()
-        var areas = sp.RecuperarListaAreas(this)
-
         val bundle = intent.extras
+        var areas = sp.RecuperarListaAreas(this)
         val areaIndex = bundle?.getInt("item")
 
         if(areaIndex != null){
@@ -48,8 +54,60 @@ class DetalhesActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        var id = item.itemId
-        Toast.makeText(this, "${item}", Toast.LENGTH_SHORT).show()
+        var id = item.title
+
+        // ADICIONAR NOVO PASTEJO
+        if (id == "Adicionar pastejo"){
+            // TODO: Adicionar um novo pastejo
+            var cal = Calendar.getInstance()
+
+            val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+                cal.set(Calendar.YEAR, year)
+                cal.set(Calendar.MONTH, monthOfYear)
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                val dataFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+
+                val sp = com.example.gdsudao.utils.SharedPreferences()
+                val bundle = intent.extras
+                var areas = sp.RecuperarListaAreas(this)
+                val areaIndex = bundle?.getInt("item")
+                if (areaIndex != null){
+                    areas[areaIndex].dataCorte = dataFmt
+                    val nc = areas[areaIndex].numeroCorte.toInt() + 1
+                    areas[areaIndex].numeroCorte = nc.toString()
+
+                    sp.AtualizarAreaLocal(this, areas[areaIndex], areaIndex)
+
+                    var intent = Intent(this, MenuActivity::class.java)
+                    startActivity(intent)
+                }else{
+                    Toast.makeText(this, "Erro ao cadastrar novo corte", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            DatePickerDialog(this, dateSetListener,
+                    cal.get(Calendar.YEAR),
+                    cal.get(Calendar.MONTH),
+                    cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        // EXCLUIR AREA ATUAL
+        if (id == "Excluir área"){
+            val sp = com.example.gdsudao.utils.SharedPreferences()
+            val bundle = intent.extras
+            var areas = sp.RecuperarListaAreas(this)
+            val areaIndex = bundle?.getInt("item")
+            if(areaIndex != null){
+                sp.RemoverAreaLista(this, areas[areaIndex])
+                var intent = Intent(this, MenuActivity::class.java)
+                startActivity(intent)
+            }else{
+                Toast.makeText(this, "Erro ao excluir area.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         return super.onOptionsItemSelected(item)
     }
 }

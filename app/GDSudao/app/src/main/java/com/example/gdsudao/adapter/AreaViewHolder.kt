@@ -61,6 +61,7 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         // TODO: calcular o progresso com base nas constatnes de st e no numero de cortes
         // tvProgresso?.text = "Data Plantio: " + "|d: " + area.diario + "|p: " + area.previsao +  "|n: " + area.normal
 
+        /*
         var progresso: Float
         if (area.numeroCorte.toInt() < 1) {
             progresso = (area.st.toFloat() / ST_PRIRO_CORTE) * 100
@@ -74,7 +75,7 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
             tvProgresso?.text = "Progresso: " + progresso.toString() + "%"
         }
 
-
+           */
         /*
         TODO: Implementar o esquema da figura ???
          */
