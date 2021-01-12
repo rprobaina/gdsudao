@@ -41,6 +41,8 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
 	fmt.Fprintf(w, "<p> Retorna a soma termica para data Temperatura Basal e a proproção de dados utililizados: </p>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/somatermica/{temperaturaBasal}/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
+	fmt.Fprintf(w, "<p> Retorna a data do proximo corte: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080//gdsudaoProximoCorte/{codigoINMET}/{dataInicial}/{numeroCortes} </ul>")
 }
 
 // getNearStation retorna os dados da estação meteorológica mais proxima
@@ -67,7 +69,7 @@ func getNearStation(w http.ResponseWriter, r *http.Request) {
 			{"$near", bson.D{
 				{"$geometry", bson.D{
 					{"type", "Point"},
-					{"coordinates", bson.A{lat, lon}}},
+					{"coordinates", bson.A{lon, lat}}},
 				}},
 			}},
 		}}
@@ -682,8 +684,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	codigoINMET := vars["codigoINMET"]
 	dataInicial := vars["dataInicial"]
-	//dataFinal := vars["dataFinal"]
-	temperaturaBasal := vars["temperaturaBasal"]
+	temperaturaBasal := 10.0
 	numeroCortes := vars["numeroCortes"]
 	nCortes, err := strconv.ParseInt(numeroCortes, 10, 32)
 
@@ -705,9 +706,6 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	dataDiarios := dataHoje.AddDate(0, 0, -2)
 	dataPrevisoes := dataHoje.AddDate(0, 0, 14)
 
-	//Conversão de string para float
-	TB, _ := strconv.ParseFloat(temperaturaBasal, 64)
-
 	// Cria o slice de datas
 	var gds []gd
 	/*
@@ -726,6 +724,10 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// Erro ao buscar estacoes
 		fmt.Println(err)
+		fmt.Println("**************************")
+		fmt.Println("NORMAIS NAO ENCONTRADAS!!!")
+		fmt.Println("**************************")
+		return
 	} else {
 		nomeEstacao := estacao["nomeEstacao"].(string)
 		queryNormais := bson.M{"nomeEstacao": nomeEstacao}
@@ -790,7 +792,16 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 				if err != nil {
 
 					if normais == nil {
-						// Erro ao buscar normais
+						// Erro ao buscar previsoes
+
+						fmt.Println(err)
+						fmt.Println("**************************")
+						fmt.Println("NORMAIS NAO ENCONTRADAS!!!")
+						fmt.Println("**************************")
+						fmt.Fprintf(w, "404")
+
+						return
+
 					} else {
 						// TODO: calcular o retorno das normais. Talvezes colocar num mapa ou fazer uma função
 						//fmt.Println(normais)
@@ -827,7 +838,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 
 			}
 			// Atualiza o vetor de graus dia
-			grausDia := calcularGrausDia(tmin, tmax, TB)
+			grausDia := calcularGrausDia(tmin, tmax, temperaturaBasal)
 			st += grausDia
 			if grausDia > 0 {
 				gdAtual.gd = grausDia
