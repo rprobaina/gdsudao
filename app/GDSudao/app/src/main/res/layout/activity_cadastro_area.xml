@@ -14,7 +14,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
         android:clickable="true"
-        android:src="?android:attr/textCheckMark"
+        android:src="@drawable/done_24px"
         android:tint="#FFFFFF"
         app:backgroundTint="@color/colorPrimaryDark"
         app:fabSize="auto"
@@ -36,6 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:title="Cadastro de área"
         app:titleTextColor="#FFFFFF" />
 
     <LinearLayout
@@ -57,7 +58,9 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nome da Area:" />
+            android:text="Nome da Area:"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etNomeArea"
@@ -65,32 +68,38 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Digite o nome da área."
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Data de semeadura ou do último corte:" />
+            android:text="Data de semeadura ou do último corte:"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold" />
 
-        <TextView
+        <EditText
             android:id="@+id/etDataUltimoCorte"
-            style="@style/Base.Widget.MaterialComponents.TextInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Digite a data do último corte" />
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:hint="Digite a data do último corte"
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Número de cortes:" />
+            android:text="Número de cortes:"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
+            android:orientation="vertical" />
 
         <EditText
             android:id="@+id/etNumeroCortes"
@@ -98,13 +107,16 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Digite o número de cortes"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal"
+            android:textColor="@color/colorAccent"/>
 
         <TextView
             android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Localização:" />
+            android:text="Localização:"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -117,7 +129,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Latitude" />
+                android:hint="Latitude"
+                android:textColor="@color/colorAccent"/>
 
             <EditText
                 android:id="@+id/etLongitude"
@@ -125,7 +138,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:hint="Longitude" />
+                android:hint="Longitude"
+                android:textColor="@color/colorAccent"/>
 
         </LinearLayout>
 
@@ -133,13 +147,15 @@
             android:id="@+id/btnAddLocalizacaoGPS"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Obter a sua localizacao pelo GPS" />
+            android:text="Obter a sua localizacao pelo GPS"
+            android:textColor="@color/colorPrimaryDark" />
 
         <Button
             android:id="@+id/btnAddLocalizacaoMAPA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Obter a sua localizacao pelo MAPA" />
+            android:text="Obter a sua localizacao pelo MAPA"
+            android:textColor="@color/colorAccent"/>
 
     </LinearLayout>
 

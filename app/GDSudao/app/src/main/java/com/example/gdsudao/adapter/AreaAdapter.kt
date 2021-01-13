@@ -2,19 +2,11 @@ package com.example.gdsudao.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ActionMenuView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gdsudao.DetalhesActivity
-import com.example.gdsudao.activity.CadastroAreaActivity
-import com.example.gdsudao.activity.MenuActivity
+import com.example.gdsudao.activity.DetalhesActivity
 import com.example.gdsudao.model.Area
-import kotlin.coroutines.coroutineContext
 
 class AreaAdapter(context: Context, private val list: List<Area>) : RecyclerView.Adapter<AreaViewHolder>(){
 

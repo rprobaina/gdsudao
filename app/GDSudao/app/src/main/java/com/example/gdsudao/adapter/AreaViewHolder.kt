@@ -35,10 +35,23 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         val ST_OUTROS_CORTES = 281.0f
 
         tvNome?.text = area.nome
-        tvDataPlantio?.text = "Data Plantio: " + area.dataCorte
-        //tvProxCorte?.text = area.proxcorte.substring(0, 10).replace("-","/", false)
         tvProxCorte?.text = area.proxcorte
-        tvNumeroCortes?.text = "Número de cortes: " + area.numeroCorte
+        tvNumeroCortes?.text = "" + area.numeroCorte
+
+        if (!area.dataCorte.isNullOrEmpty()){
+            tvDataPlantio?.text = "${area.dataCorte.substring(8, 10)}/${area.dataCorte.substring(5, 7)}/${area.dataCorte.substring(0, 4)}"
+        }else{
+            tvDataPlantio?.text = "ERRO"
+        }
+
+
+        if (!area.proxcorte.isNullOrEmpty()){
+            tvProxCorte?.text = "${area.proxcorte.substring(8, 10)}/${area.proxcorte.substring(5, 7)}/${area.proxcorte.substring(0, 4)}"
+            //tvProxCorte?.text = area.proxcorte.substring(0, 10).replace("-","/", false)
+        }else{
+            tvProxCorte?.text = "ERRO"
+        }
+
 
         if (area.diario.length > 5){
             tvDiarios?.text = area.diario.substring(0, 4) + "%" //.substring(5) + "%"
@@ -61,21 +74,25 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         // TODO: calcular o progresso com base nas constatnes de st e no numero de cortes
         // tvProgresso?.text = "Data Plantio: " + "|d: " + area.diario + "|p: " + area.previsao +  "|n: " + area.normal
 
-        /*
-        var progresso: Float
-        if (area.numeroCorte.toInt() < 1) {
-            progresso = (area.st.toFloat() / ST_PRIRO_CORTE) * 100
-        }else {
-            progresso =  (area.st.toFloat() / ST_OUTROS_CORTES ) * 100
-        }
 
-        if (progresso.toString().length > 5) {
-            tvProgresso?.text = "Progresso: " + progresso.toString().substring(0, 4) + "%"
+        if (!area.st.isNullOrEmpty() && !area.numeroCorte.isNullOrEmpty()){
+            var progresso: Float
+            if (area.numeroCorte.toInt() < 1) {
+                progresso = (area.st.toFloat() / ST_PRIRO_CORTE) * 100
+            }else {
+                progresso =  (area.st.toFloat() / ST_OUTROS_CORTES ) * 100
+            }
+
+            if (progresso.toString().length > 5) {
+                tvProgresso?.text = "" + progresso.toString().substring(0, 4) + "%"
+            }else{
+                tvProgresso?.text = "" + progresso.toString() + "%"
+            }
         }else{
-            tvProgresso?.text = "Progresso: " + progresso.toString() + "%"
+            tvProgresso?.text = "Progresso: ERRO"
         }
 
-           */
+
         /*
         TODO: Implementar o esquema da figura ???
          */

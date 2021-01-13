@@ -31,6 +31,7 @@ class CadastroAreaActivity : AppCompatActivity() {
     var numeroCortes = ""
     var latitude = ""
     var longitude = ""
+    var dataFmt = ""
 
     override fun onResume() {
         super.onResume()
@@ -43,6 +44,7 @@ class CadastroAreaActivity : AppCompatActivity() {
             numeroCortes = bundle?.getString("nC").toString()
             latitude = bundle?.getString("lat").toString()
             longitude = bundle?.getString("lon").toString()
+
             Log.println(Log.DEBUG, "bundle", "${nomeArea} + ${bundle.getString("lon")}")
         }
 
@@ -104,7 +106,7 @@ class CadastroAreaActivity : AppCompatActivity() {
 
             dataFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
-            etDataUltimoCorte.text = sdf.format(cal.time)
+            etDataUltimoCorte.text = Editable.Factory.getInstance().newEditable(sdf.format(cal.time))
         }
 
         etDataUltimoCorte.setOnClickListener {
@@ -134,7 +136,7 @@ class CadastroAreaActivity : AppCompatActivity() {
             var numeroCortes = etNumeroCortes.text.toString()
             var latitude = etLatitude.text.toString()
             var longitude = etLongitude.text.toString()
-
+            var dataCorte = etDataUltimoCorte.text.toString()
 
             //intent.putExtra("nomeArea", nomeArea)
             //intent.putExtra("dataCorte", dataCorte)
@@ -144,9 +146,13 @@ class CadastroAreaActivity : AppCompatActivity() {
 
             // Salvar na fila de areas
 
-            if(validarDados(nomeArea, dataFmt, numeroCortes, latitude, longitude)){
+            if(validarDados(nomeArea, dataCorte, numeroCortes, latitude, longitude)){
 
                 var intent = Intent(this, MenuActivity::class.java)
+                if (dataFmt.isNullOrEmpty()){
+                    dataFmt = "${dataCorte.substring(6,10)}-${dataCorte.substring(3,5)}-${dataCorte.substring(0,2)}"
+                    Toast.makeText(this, dataFmt, Toast.LENGTH_SHORT).show()
+                }
                 println("Nome area: " + nomeArea)
                 println("Data Corte: " + dataFmt)
                 println("N Cortes: " + numeroCortes)

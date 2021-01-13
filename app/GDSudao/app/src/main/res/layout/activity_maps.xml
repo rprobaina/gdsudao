@@ -16,5 +16,6 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="8dp"
         android:clickable="true"
-        android:src="@android:drawable/btn_plus" />
+        android:src="@drawable/where_to_vote_24px"
+        android:tint="#FFFFFF" />
 </fragment>

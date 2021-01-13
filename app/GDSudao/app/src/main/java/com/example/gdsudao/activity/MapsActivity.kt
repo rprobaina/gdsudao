@@ -45,7 +45,7 @@ class MapsActivity : AppCompatActivity(),  OnMapReadyCallback {
             numeroCortes = bundle?.getString("nC").toString()
             latitude = bundle?.getString("lat").toString()
             longitude = bundle?.getString("lon").toString()
-            Log.println(Log.DEBUG, "chegou?", "${nomeArea} + ${dataCorte} + ${numeroCortes} ")
+            //Log.println(Log.DEBUG, "chegou?", "${nomeArea} + ${dataCorte} + ${numeroCortes} ")
         }
 
 
@@ -74,8 +74,8 @@ class MapsActivity : AppCompatActivity(),  OnMapReadyCallback {
             if (contLocation < 1){
                 contLocation++
                 val location = LatLng(it.latitude, it.longitude)
-                latitude = it.latitude.toString()
-                longitude = it.longitude.toString()
+                latitude = it.latitude.toString().substring(0, 11)
+                longitude = it.longitude.toString().substring(0, 11)
                 val marker = mMap.addMarker(MarkerOptions().position(location).title("Localização atual"))
                 marker.showInfoWindow()
             }
