@@ -8,10 +8,10 @@ import android.location.Location
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
-import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.gdsudao.utils.FusedLocationProvider
 import com.example.gdsudao.R
 import com.example.gdsudao.model.Area
 import com.example.gdsudao.model.Estacao
@@ -220,7 +220,18 @@ class CadastroAreaActivity : AppCompatActivity() {
                         etLatitude.text = Editable.Factory.getInstance().newEditable(lat)
                         etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
                     } else {
-                        Toast.makeText(this, "Localização indisponível", Toast.LENGTH_SHORT).show()
+                        val flp = FusedLocationProvider(this)
+                        flp.startUpdates()
+                        val location = flp.getCurrentLocation()
+                        if( location != null){
+                            var lat = location.latitude.toString()
+                            var lon = location.longitude.toString()
+
+                            etLatitude.text = Editable.Factory.getInstance().newEditable(lat)
+                            etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
+                        }else{
+                            Toast.makeText(this, "Atualizando a sua localização, verifique se o GPS está habilitado e tente novamente.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
 
