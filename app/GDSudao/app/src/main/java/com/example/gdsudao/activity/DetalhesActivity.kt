@@ -161,30 +161,55 @@ class DetalhesActivity : AppCompatActivity() {
         // ADICIONAR NOVO PASTEJO
         if (id == "Adicionar pastejo"){
 
-            // TODO: Adicionar um novo pastejo
-            var cal = Calendar.getInstance()
 
-            val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+               var cal = Calendar.getInstance()
+
+                val dateSetListener = DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
                 cal.set(Calendar.YEAR, year)
                 cal.set(Calendar.MONTH, monthOfYear)
                 cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
 
                 val dataFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+
+
 
                 val sp = com.example.gdsudao.utils.SharedPreferences()
                 val bundle = intent.extras
                 var areas = sp.RecuperarListaAreas(this)
                 val areaIndex = bundle?.getInt("item")
+
+
                 if (areaIndex != null){
-                    areas[areaIndex].dataCorte = dataFmt
-                    val nc = areas[areaIndex].numeroCorte.toInt() + 1
-                    areas[areaIndex].numeroCorte = nc.toString()
+                    //Toast.makeText(this, "${dataFmt} == ${areas[areaIndex].dataCorte}", Toast.LENGTH_SHORT).show()
 
-                    sp.AtualizarAreaLocal(this, areas[areaIndex], areaIndex)
+                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                    var ultimoPastejo = sdf.parse(areas[areaIndex].dataCorte)
+                    var novoPastejo = sdf.parse(dataFmt)
 
-                    var intent = Intent(this, MenuActivity::class.java)
-                    startActivity(intent)
+                    if ( (areas[areaIndex].numeroCorte.toInt() < 1 && areas[areaIndex].st.toFloat() >= 200.00)
+                        ||(areas[areaIndex].numeroCorte.toInt() >= 1 && areas[areaIndex].st.toFloat() >= 100.00)){
+
+
+                        if (novoPastejo.after(ultimoPastejo)){
+                            areas[areaIndex].dataCorte = dataFmt
+                            val nc = areas[areaIndex].numeroCorte.toInt() + 1
+                            areas[areaIndex].numeroCorte = nc.toString()
+
+                            sp.AtualizarAreaLocal(this, areas[areaIndex], areaIndex)
+
+                            var intent = Intent(this, MenuActivity::class.java)
+                            startActivity(intent)
+                        }else{
+                            Toast.makeText(this, "O novo pastejo deve acontecer depois do último cadastrado.", Toast.LENGTH_SHORT).show()
+                        }
+                    }else{
+                        if(areas[areaIndex].numeroCorte.toInt() < 1){
+                            Toast.makeText(this, "O novo pastejo não deve ocorrer com menos de 200 graus-dia.", Toast.LENGTH_SHORT).show()
+                        }else{
+                            Toast.makeText(this, "O novo pastejo não deve ocorrer com menos de 100 graus-dia.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
                 }else{
                     Toast.makeText(this, "Erro ao cadastrar novo corte", Toast.LENGTH_SHORT).show()
                 }

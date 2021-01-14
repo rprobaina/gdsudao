@@ -44,8 +44,6 @@ class CadastroAreaActivity : AppCompatActivity() {
             numeroCortes = bundle?.getString("nC").toString()
             latitude = bundle?.getString("lat").toString()
             longitude = bundle?.getString("lon").toString()
-
-            Log.println(Log.DEBUG, "bundle", "${nomeArea} + ${bundle.getString("lon")}")
         }
 
         etNomeArea.text = Editable.Factory.getInstance().newEditable(nomeArea)
@@ -69,7 +67,6 @@ class CadastroAreaActivity : AppCompatActivity() {
         val bundle = intent.extras
 
         if (bundle != null){
-            Log.println(Log.DEBUG, "bundle", "Cadastro area bundle not null ${bundle}")
             nomeArea = bundle?.getStringArrayList("nA").toString()
             dataCorte = bundle?.getStringArrayList("dC").toString()
             numeroCortes = bundle?.getStringArrayList("nC").toString()
@@ -83,19 +80,6 @@ class CadastroAreaActivity : AppCompatActivity() {
         etLatitude.text = Editable.Factory.getInstance().newEditable(latitude)
         etLongitude.text = Editable.Factory.getInstance().newEditable(longitude)
 
-
-        // so para remover a cagada
-        //var sp = com.example.gdsudao.utils.SharedPreferences()
-        //sp.RemoverAllAreaLista(this)
-
-/*
-        btnAddLocalizacaoGPS.setOnClickListener {
-            var sp = com.example.gdsudao.utils.SharedPreferences()
-            sp.RemoverAllAreaLista(this)
-        }
- */
-        // Adding calendario
-        //etDataUltimoCorte.text = SimpleDateFormat("dd.MM.yyyy")
 
         var cal = Calendar.getInstance()
 
@@ -123,35 +107,17 @@ class CadastroAreaActivity : AppCompatActivity() {
 
             var nomeArea = etNomeArea.text.toString()
 
-            /* date FMT global
-            var dataCorte = etDataUltimoCorte.text.toString()
-
-            var d = SimpleDateFormat("dd/MM/yyyy").parse(dataCorte);
-            val sdf = SimpleDateFormat("yyyy-MM-dd");
-            val dataCorteFmt = sdf.format(d);
-
-             */
-            //Toast.makeText(this, dataCorte, Toast.LENGTH_SHORT).show()
 
             var numeroCortes = etNumeroCortes.text.toString()
             var latitude = etLatitude.text.toString()
             var longitude = etLongitude.text.toString()
             var dataCorte = etDataUltimoCorte.text.toString()
 
-            //intent.putExtra("nomeArea", nomeArea)
-            //intent.putExtra("dataCorte", dataCorte)
-            //intent.putExtra("numeroCortes", numeroCortes)
-            // intent.putExtra("latitude", latitude)
-            // intent.putExtra("longitude", longitude)
-
-            // Salvar na fila de areas
-
             if(validarDados(nomeArea, dataCorte, numeroCortes, latitude, longitude)){
 
                 var intent = Intent(this, MenuActivity::class.java)
                 if (dataFmt.isNullOrEmpty()){
                     dataFmt = "${dataCorte.substring(6,10)}-${dataCorte.substring(3,5)}-${dataCorte.substring(0,2)}"
-                    Toast.makeText(this, dataFmt, Toast.LENGTH_SHORT).show()
                 }
                 println("Nome area: " + nomeArea)
                 println("Data Corte: " + dataFmt)
@@ -170,7 +136,6 @@ class CadastroAreaActivity : AppCompatActivity() {
                         if (response.isSuccessful) {
                             var codigoINMET = response.body().codigoINMET.toString()
                             area.codigoEstacao = codigoINMET
-                            Toast.makeText(applicationContext, codigoINMET, Toast.LENGTH_LONG).show()
                             sp.SalvarAreaLista(applicationContext, area)
 
                             startActivity(intent)
@@ -184,7 +149,7 @@ class CadastroAreaActivity : AppCompatActivity() {
                     }
                 })
             }else{
-                Toast.makeText(this, "Dados invalidos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Dados inválidos", Toast.LENGTH_SHORT).show()
             }
 
 
@@ -230,7 +195,7 @@ class CadastroAreaActivity : AppCompatActivity() {
                             etLatitude.text = Editable.Factory.getInstance().newEditable(lat)
                             etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
                         }else{
-                            Toast.makeText(this, "Atualizando a sua localização, verifique se o GPS está habilitado e tente novamente.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Loacilização indisponível! Verifique se GPS está habilitado.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -258,18 +223,6 @@ class CadastroAreaActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        //Retornando os dados do mapa
-        /*
-        val bundle = intent.extras
-        val lat = bundle?.getString("lat")
-        val lon = bundle?.getString("lon")
-        if (!lat.isNullOrEmpty() && !lon.isNullOrEmpty()){
-            Toast.makeText(this, "Localização retornada com sucesso", Toast.LENGTH_SHORT).show()
-            etLatitude.text = Editable.Factory.getInstance().newEditable(lat)
-            etLongitude.text = Editable.Factory.getInstance().newEditable(lon)
-        }
-        */
-        //onOptionsItemSelected(R.layout.detalhes_menu)
     }
 
 

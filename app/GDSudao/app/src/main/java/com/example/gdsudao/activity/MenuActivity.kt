@@ -32,40 +32,22 @@ class MenuActivity : AppCompatActivity() {
         var sp = com.example.gdsudao.utils.SharedPreferences()
         //sp.RemoverAllAreaLista(this) //Se eu cadastrar uma are errada liberar isso
         var areas = sp.RecuperarListaAreas(this)
-        Log.println(Log.DEBUG, "areas", areas.toString())
 
         if (areas.size > 0) {
             areas.forEach(){
-                //Toast.makeText(this, it.toString(), Toast.LENGTH_LONG).show()
-                // Consultar estacao
                 val requestCall = RetrofitInitializer().apiService().attArea(it.codigoEstacao, it.dataCorte, it.numeroCorte)
-                //Toast.makeText(this, requestCall.toString(), Toast.LENGTH_SHORT).show()
                 requestCall.enqueue(object : Callback<Area> {
                     override fun onResponse(call: Call<Area>, response: Response<Area>) {
                         if (response.isSuccessful) {
                             var areaResponse = response.body()
-                            Toast.makeText(
-                                this@MenuActivity,
-                                areaResponse.toString(),
-                                Toast.LENGTH_SHORT
-                            ).show()
                             it.st = areaResponse.st
                             it.proxcorte = areaResponse.proxcorte
                             it.diario = areaResponse.diario
                             it.previsao = areaResponse.previsao
                             it.normal = areaResponse.normal
-                            Log.println(Log.DEBUG, "areas", response.toString())
 
                             sp.AtualizarAreaLocal(this@MenuActivity, it, areas.indexOf(it))
 
-                            /*
-                            recyclerViewAreas.apply {
-                                layoutManager = LinearLayoutManager(this@MenuActivity)
-                                adapter = AreaAdapter(this@MenuActivity, areas)
-                                hasFixedSize()
-                            }
-
-                             */
                         } else {
                             //TODO
                         }
@@ -73,7 +55,7 @@ class MenuActivity : AppCompatActivity() {
 
                     // Trata a falha de conexão com a APU
                     override fun onFailure(call: Call<Area>?, t: Throwable?) {
-                        Toast.makeText(this@MenuActivity, "Falha de conexão com a API.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MenuActivity, "Falha ao atualizar os dados da Área ${it.nome}", Toast.LENGTH_SHORT).show()
                     }
                 })
 
@@ -87,16 +69,6 @@ class MenuActivity : AppCompatActivity() {
 
 
         }
-
-
-
-
-        /* Configurar o Recyclerviwer
-        var viewManager = LinearLayoutManager(this)
-        recyclerViewAreas.layoutManager = viewManager
-        recyclerViewAreas.hasFixedSize()
-        recyclerViewAreas.adapter = viewAdapter
-         */
 
         // Vai para o cadastro de Área
         btnAddArea.setOnClickListener{
@@ -115,11 +87,6 @@ class MenuActivity : AppCompatActivity() {
     }
 
 
-
-   fun attAreas(areas: ArrayList<Area>) {
-
-   }
-
     fun getNormais(nomeEstacao: String){
 
         val requestCall = RetrofitInitializer().apiService().getNormais(nomeEstacao)
@@ -129,14 +96,13 @@ class MenuActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Normal>, response: Response<Normal>) {
                 if (response.isSuccessful) {
                     var normais = response.body()
-                    Toast.makeText(this@MenuActivity, "DENTRO" + normais, Toast.LENGTH_LONG).show()
                 }else{
-                    Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Normal>?, t: Throwable?) {
-                Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -151,14 +117,14 @@ class MenuActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<Diario>>, response: Response<List<Diario>>) {
                 if (response.isSuccessful) {
                     var diarios = response.body()
-                    Toast.makeText(this@MenuActivity, "DENTRO" + diarios, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@MenuActivity, "DENTRO" + diarios, Toast.LENGTH_LONG).show()
                 }else{
-                    Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Diario>>?, t: Throwable?) {
-                Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -173,14 +139,14 @@ class MenuActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<Previsao>>, response: Response<List<Previsao>>) {
                 if (response.isSuccessful) {
                     var previsoes = response.body()
-                    Toast.makeText(this@MenuActivity, "DENTRO" + previsoes, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(this@MenuActivity, "DENTRO" + previsoes, Toast.LENGTH_LONG).show()
                 }else{
-                    Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this@MenuActivity, "ERRO1", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Previsao>>?, t: Throwable?) {
-                Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this@MenuActivity, "ERRO2:" + t.toString() , Toast.LENGTH_SHORT).show()
             }
         })
 
