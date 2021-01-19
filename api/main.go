@@ -43,6 +43,8 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<ul> https://localhost:8080/somatermica/{temperaturaBasal}/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
 	fmt.Fprintf(w, "<p> Retorna a data do proximo corte: </p>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080//gdsudaoProximoCorte/{codigoINMET}/{dataInicial}/{numeroCortes} </ul>")
+	fmt.Fprintf(w, "<p> Retorna o número estimados de pastejos em uma região em determinado intervalo: </p>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
 }
 
 // getNearStation retorna os dados da estação meteorológica mais proxima
@@ -1094,7 +1096,97 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 }
 */
 
-//888
+// getPasterjos retorna o número máximo de pastejos de uma área
+func getPastejos(w http.ResponseWriter, r *http.Request) {
+
+	// Constantes
+	ST_PRIRO_CORTE := 358.00
+	ST_OUTROS_CORTES := 281.00
+
+	// Recebe os parametros enviados através da requisição HTTP
+	vars := mux.Vars(r)
+	codigoINMET := vars["codigoINMET"]
+	dataInicial := vars["dataInicial"]
+	dataFinal := vars["dataFinal"]
+
+	// Conexão com o banco de dados
+	dataBaseURI := "mongodb://127.0.0.1:27017"
+	mongoClient := mongoapi.StartConnection(dataBaseURI)
+	collectionNormais := mongoClient.Database("gdsudao").Collection("normais")
+	collectionEstacoes := mongoClient.Database("gdsudao").Collection("estacoes")
+	defer mongoapi.CloseConnection(*mongoClient)
+
+	// Conversao das datas para o formato ISO
+	layoutISO := "2006-01-02"
+	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
+	dataFinalISO, _ := time.Parse(layoutISO, dataFinal)
+	dataFinalISO = dataFinalISO.AddDate(0, 0, 1)
+
+	if dataInicialISO.Before(dataFinalISO) {
+		// Cria o slice de datas
+		var gds []gd
+		for currentDate := dataInicialISO; currentDate != dataFinalISO; currentDate = currentDate.AddDate(0, 0, 1) {
+			gd := gd{currentDate, 0, "nil", false}
+			gds = append(gds, gd)
+		}
+
+		// Coletando os dados de normais
+		var normais bson.M
+		queryEstacao := bson.M{"codigoINMET": codigoINMET}
+
+		var estacao bson.M
+		err := collectionEstacoes.FindOne(context.TODO(), queryEstacao).Decode(&estacao)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			nomeEstacao := estacao["nomeEstacao"].(string)
+			queryNormais := bson.M{"nomeEstacao": nomeEstacao}
+			err := collectionNormais.FindOne(context.TODO(), queryNormais).Decode(&normais)
+			if err != nil {
+				normais = nil
+			}
+		}
+
+		if normais == nil {
+			resposta := bson.M{"erro": "Codigo de estação inválido"}
+			json.NewEncoder(w).Encode(resposta)
+		} else {
+			var gdTotal = 0.0
+			for _, x := range gds {
+				normal := getNormal(x.data.Month().String(), normais)
+				grausDia := calcularGrausDia(normal, normal, 10.0)
+				x.gd = grausDia
+				gdTotal += grausDia
+				//fmt.Println(x.data.Format(layoutISO) + ": " + fmt.Sprintf("%s", x.gd))
+			}
+
+			//fmt.Println(gdTotal)
+
+			var cc = 0.0
+			if (gdTotal - ST_PRIRO_CORTE) > 0 {
+				cc++
+				gdTotal -= ST_PRIRO_CORTE
+			} else {
+				cc = 0.0
+			}
+
+			cc += gdTotal / ST_OUTROS_CORTES
+			ccf := fmt.Sprintf("%.2f", cc)
+
+			resposta := bson.M{"Pastejos": ccf}
+			if gds == nil {
+				fmt.Fprintf(w, "Codigo de estação inválido")
+			} else {
+				json.NewEncoder(w).Encode(resposta)
+			}
+		}
+
+	} else {
+		resposta := bson.M{"erro": "A data final dever maior que a data inicial"}
+		json.NewEncoder(w).Encode(resposta)
+	}
+
+}
 
 //	handleRequests trata das requisições (mapeia a requisição para a função adequada)
 func handleRequests() {
@@ -1107,6 +1199,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal}", getGrausDiaSudao).Methods("GET")
 	myRouter.HandleFunc("/gdsudaoProximoCorte/{codigoINMET}/{dataInicial}/{numeroCortes}", getGrausDiaSudaoProxCorte).Methods("GET")
 	myRouter.HandleFunc("/grausdia/{codigoINMET}/{temperaturaBasal}/{dataInicial}/{dataFinal}", getGrausDia).Methods("GET")
+	myRouter.HandleFunc("/pastejos/{codigoINMET}/{dataInicial}/{dataFinal}", getPastejos).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8082", myRouter))
 }
 
