@@ -12,6 +12,7 @@ import com.example.gdsudao.R
 import kotlinx.android.synthetic.main.activity_detalhes.*
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 class DetalhesActivity : AppCompatActivity() {
 
@@ -79,22 +80,22 @@ class DetalhesActivity : AppCompatActivity() {
 
             }
              */
-            var dia = areas[areaIndex].diario.toFloat().toInt()
+            var dia = areas[areaIndex].diario.toFloat().roundToInt()
             if (dia != null){
                 tvDiarios.text = dia.toString() + "%"
             }
 
-            var pre = areas[areaIndex].previsao.toFloat().toInt()
+            var pre = areas[areaIndex].previsao.toFloat().roundToInt()
             if (pre != null){
                 tvPrevisoes.text = pre.toString() + "%"
             }
 
-            var nor = areas[areaIndex].normal.toFloat().toInt()
+            var nor = areas[areaIndex].normal.toFloat().roundToInt()
             if (nor != null){
                 tvNormais.text = nor.toString() + "%"
             }
 
-            var st = areas[areaIndex].st.toFloat().toInt()
+            var st = areas[areaIndex].st.toFloat().roundToInt()
             if (st != null){
                 tvGdAcumulado.text = st.toString() + " gd"
             }

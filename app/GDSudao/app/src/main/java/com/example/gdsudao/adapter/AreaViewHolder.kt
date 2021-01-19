@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gdsudao.R
 import com.example.gdsudao.model.Area
 import kotlinx.android.synthetic.main.activity_detalhes.*
+import kotlin.math.roundToInt
 
 class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.ViewHolder(inflater.inflate(R.layout.adapter_area, parent, false)){
     private var tvNome: TextView? = null
@@ -55,17 +56,17 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
 
 
 
-        var dia = area.diario.toFloat().toInt()
+        var dia = area.diario.toFloat().roundToInt()
         if (dia != null){
             tvDiarios?.text = dia.toString() + "%"
         }
 
-        var pre = area.previsao.toFloat().toInt()
+        var pre = area.previsao.toFloat().roundToInt()
         if (pre != null){
             tvPrevisoes?.text = pre.toString() + "%"
         }
 
-        var nor = area.normal.toFloat().toInt()
+        var nor = area.normal.toFloat().roundToInt()
         if (nor != null){
             tvNormais?.text = nor.toString() + "%"
         }
