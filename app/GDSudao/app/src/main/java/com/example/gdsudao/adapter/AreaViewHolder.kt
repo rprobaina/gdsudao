@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gdsudao.R
 import com.example.gdsudao.model.Area
+import kotlinx.android.synthetic.main.activity_detalhes.*
 
 class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.ViewHolder(inflater.inflate(R.layout.adapter_area, parent, false)){
     private var tvNome: TextView? = null
@@ -53,6 +54,23 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         }
 
 
+
+        var dia = area.diario.toFloat().toInt()
+        if (dia != null){
+            tvDiarios?.text = dia.toString() + "%"
+        }
+
+        var pre = area.previsao.toFloat().toInt()
+        if (pre != null){
+            tvPrevisoes?.text = pre.toString() + "%"
+        }
+
+        var nor = area.normal.toFloat().toInt()
+        if (nor != null){
+            tvNormais?.text = nor.toString() + "%"
+        }
+
+        /*
         if (area.diario.length > 5){
             tvDiarios?.text = area.diario.substring(0, 4) + "%" //.substring(5) + "%"
         }else{
@@ -71,6 +89,8 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
             tvNormais?.text = area.normal + "%"  //.substring(5) + "%"
         }
 
+         */
+
         // TODO: calcular o progresso com base nas constatnes de st e no numero de cortes
         // tvProgresso?.text = "Data Plantio: " + "|d: " + area.diario + "|p: " + area.previsao +  "|n: " + area.normal
 
@@ -83,19 +103,16 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
                 progresso =  (area.st.toFloat() / ST_OUTROS_CORTES ) * 100
             }
 
-            if (progresso.toString().length > 5) {
-                tvProgresso?.text = "" + progresso.toString().substring(0, 4) + "%"
-            }else{
-                tvProgresso?.text = "" + progresso.toString() + "%"
+            var pro = progresso.toInt()
+            if (pro != null){
+                tvProgresso?.text = pro.toString() + "%"
             }
+
         }else{
             tvProgresso?.text = "Progresso: ERRO"
         }
 
 
-        /*
-        TODO: Implementar o esquema da figura ???
-         */
     }
 
 

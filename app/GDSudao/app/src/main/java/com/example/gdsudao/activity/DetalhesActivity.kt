@@ -52,11 +52,12 @@ class DetalhesActivity : AppCompatActivity() {
                 tvDataUltimoPastejo.text = "ERRO"
             }
 
+            /*
             if (areas[areaIndex].diario.length > 5){
                 tvDiarios.text = areas[areaIndex].diario.substring(0, 4) + "%" //.substring(5) + "%"
             }else{
                 tvDiarios.text = areas[areaIndex].diario + "%"
-            }
+
 
             if (areas[areaIndex].previsao.length > 5){
                 tvPrevisoes.text = areas[areaIndex].previsao.substring(0, 4) + "%"  //.substring(5) + "%"
@@ -76,6 +77,28 @@ class DetalhesActivity : AppCompatActivity() {
                 tvGdAcumulado.text = areas[areaIndex].st //.substring(5) + "%"
             }
 
+            }
+             */
+            var dia = areas[areaIndex].diario.toFloat().toInt()
+            if (dia != null){
+                tvDiarios.text = dia.toString() + "%"
+            }
+
+            var pre = areas[areaIndex].previsao.toFloat().toInt()
+            if (pre != null){
+                tvPrevisoes.text = pre.toString() + "%"
+            }
+
+            var nor = areas[areaIndex].normal.toFloat().toInt()
+            if (nor != null){
+                tvNormais.text = nor.toString() + "%"
+            }
+
+            var st = areas[areaIndex].st.toFloat().toInt()
+            if (st != null){
+                tvGdAcumulado.text = st.toString() + " gd"
+            }
+
 
             tvEstacao.text  = areas[areaIndex].codigoEstacao
             tvNumeroCortes.text = areas[areaIndex].numeroCorte
@@ -88,16 +111,20 @@ class DetalhesActivity : AppCompatActivity() {
                     progresso =  (areas[areaIndex].st.toFloat() / ST_OUTROS_CORTES ) * 100
                 }
 
+
                 progressBar.progress = progresso.toInt()
+
+                /*
                 if (progresso.toString().length > 5){
                     tvProgresso.text = progresso.toString().substring(0, 4) + "%"  //.substring(5) + "%"
                 }else{
                     tvProgresso.text = progresso.toString() + "%"  //.substring(5) + "%"
                 }
+                */
 
             }else{
                 progressBar.progress = 0
-                tvProgresso.text = "0%"
+                //tvProgresso.text = "0%"
             }
             /*
 
