@@ -53,12 +53,12 @@ class DetalhesActivity : AppCompatActivity() {
                 tvDataUltimoPastejo.text = "ERRO"
             }
 
-            /*
+
             if (areas[areaIndex].diario.length > 5){
                 tvDiarios.text = areas[areaIndex].diario.substring(0, 4) + "%" //.substring(5) + "%"
-            }else{
+            }else {
                 tvDiarios.text = areas[areaIndex].diario + "%"
-
+            }
 
             if (areas[areaIndex].previsao.length > 5){
                 tvPrevisoes.text = areas[areaIndex].previsao.substring(0, 4) + "%"  //.substring(5) + "%"
@@ -78,8 +78,9 @@ class DetalhesActivity : AppCompatActivity() {
                 tvGdAcumulado.text = areas[areaIndex].st //.substring(5) + "%"
             }
 
-            }
-             */
+
+
+            /*
             var dia = areas[areaIndex].diario.toFloat().roundToInt()
             if (dia != null){
                 tvDiarios.text = dia.toString() + "%"
@@ -99,7 +100,7 @@ class DetalhesActivity : AppCompatActivity() {
             if (st != null){
                 tvGdAcumulado.text = st.toString() + " gd"
             }
-
+            */
 
             tvEstacao.text  = areas[areaIndex].codigoEstacao
             tvNumeroCortes.text = areas[areaIndex].numeroCorte

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Adapter
 import android.widget.ListAdapter
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +21,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MenuActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +69,6 @@ class MenuActivity : AppCompatActivity() {
                 }
             }
 
-
         }
 
         // Vai para o cadastro de Área
@@ -76,14 +77,59 @@ class MenuActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+    }
 
 
 
+    override fun onResume() {
+        //var areas = listOf(Area("teste", "teste"))
+        var sp = com.example.gdsudao.utils.SharedPreferences()
+        //sp.RemoverAllAreaLista(this) //Se eu cadastrar uma are errada liberar isso
+        var areas = sp.RecuperarListaAreas(this)
 
+        if (areas.size > 0) {
+            areas.forEach() {
+                val requestCall = RetrofitInitializer().apiService()
+                    .attArea(it.codigoEstacao, it.dataCorte, it.numeroCorte)
+                requestCall.enqueue(object : Callback<Area> {
+                    override fun onResponse(call: Call<Area>, response: Response<Area>) {
+                        if (response.isSuccessful) {
+                            var areaResponse = response.body()
+                            it.st = areaResponse.st
+                            it.proxcorte = areaResponse.proxcorte
+                            it.diario = areaResponse.diario
+                            it.previsao = areaResponse.previsao
+                            it.normal = areaResponse.normal
 
+                            sp.AtualizarAreaLocal(this@MenuActivity, it, areas.indexOf(it))
 
+                        } else {
+                            //TODO
+                        }
+                    }
 
+                    // Trata a falha de conexão com a APU
+                    override fun onFailure(call: Call<Area>?, t: Throwable?) {
+                        Toast.makeText(
+                            this@MenuActivity,
+                            "Falha ao atualizar os dados da Área ${it.nome}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
 
+                // Gera a lista de areas cadastradas
+                recyclerViewAreas.apply {
+                    layoutManager = LinearLayoutManager(this@MenuActivity)
+                    adapter = AreaAdapter(this@MenuActivity, areas)
+                    hasFixedSize()
+                }
+            }
+        }
+        var adapter = AreaAdapter(this@MenuActivity, areas)
+        adapter.notifyDataSetChanged()
+
+        super.onResume()
     }
 
 

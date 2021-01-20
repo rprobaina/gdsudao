@@ -136,6 +136,7 @@ class CadastroAreaActivity : AppCompatActivity() {
                         if (response.isSuccessful) {
                             var codigoINMET = response.body().codigoINMET.toString()
                             area.codigoEstacao = codigoINMET
+
                             sp.SalvarAreaLista(applicationContext, area)
 
                             startActivity(intent)

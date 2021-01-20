@@ -56,6 +56,7 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
 
 
 
+        /*
         var dia = area.diario.toFloat().roundToInt()
         if (dia != null){
             tvDiarios?.text = dia.toString() + "%"
@@ -70,8 +71,9 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
         if (nor != null){
             tvNormais?.text = nor.toString() + "%"
         }
+        */
 
-        /*
+
         if (area.diario.length > 5){
             tvDiarios?.text = area.diario.substring(0, 4) + "%" //.substring(5) + "%"
         }else{
@@ -90,7 +92,7 @@ class AreaViewHolder(inflater: LayoutInflater, parent: ViewGroup): RecyclerView.
             tvNormais?.text = area.normal + "%"  //.substring(5) + "%"
         }
 
-         */
+
 
         // TODO: calcular o progresso com base nas constatnes de st e no numero de cortes
         // tvProgresso?.text = "Data Plantio: " + "|d: " + area.diario + "|p: " + area.previsao +  "|n: " + area.normal
