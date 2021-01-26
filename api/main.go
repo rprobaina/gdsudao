@@ -25,26 +25,35 @@ type gd struct {
 
 // homePage retorna as informações gerais da API
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1> GDSudao API </h1>")
-	fmt.Fprintf(w, "<p> Essa é uma API utilizada pelo projeto GDSusão. </p>")
-	fmt.Fprintf(w, "<p> Como usar: </p>")
+	fmt.Fprintf(w, "<h1> GD Sudão Application Programing Interface </h1>")
+	fmt.Fprintf(w, "<p> Essa API compõem o FMIS GD Sudão, densenvolvido em parceiria pela Universidade Federal do Pampa e Embrapa Pecuária Sul. </p>")
+	fmt.Fprintf(w, "<h2> Como usar: </h2>")
 	fmt.Fprintf(w, "<p> </p>")
-	fmt.Fprintf(w, "<p> Retorna dados da estação meteorológica mais próxima: </p>")
+	fmt.Fprintf(w, "<ul>")
+	fmt.Fprintf(w, "<li> <b> Retorna dados da estação meteorológica mais próxima a um ponto: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/estacao/maisproxima/{latitude}/{longitude} </ul>")
-	fmt.Fprintf(w, "<p> Retorna dados de normais climatológicas de uma estação: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna dados de normais climatológicas de uma estação: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/normais/{nomeEstacao} </ul>")
-	fmt.Fprintf(w, "<p> Retorna dados diarios de uma estação: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna dados diários de uma estação: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/diarios/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
-	fmt.Fprintf(w, "<p> Retorna dados de previsão do tempo de uma estação: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna dados de previsão do tempo de uma estação: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/previsoes/{codigoINMET}/{dataAtual} </ul>")
-	fmt.Fprintf(w, "<p> Retorna a soma termica para o Capin Sudão BRS-Stribo e a proproção de dados utililizados: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna a soma térmica para o Capim-Sudão BRS-Stribo e a proproção de dados utililizados: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
-	fmt.Fprintf(w, "<p> Retorna a soma termica para data Temperatura Basal e a proproção de dados utililizados: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna a soma térmica para determinada temperatura basal e a proproção de dados utililizados: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/somatermica/{temperaturaBasal}/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
-	fmt.Fprintf(w, "<p> Retorna a data do proximo corte: </p>")
-	fmt.Fprintf(w, "<ul> https://localhost:8080//gdsudaoProximoCorte/{codigoINMET}/{dataInicial}/{numeroCortes} </ul>")
-	fmt.Fprintf(w, "<p> Retorna o número estimados de pastejos em uma região em determinado intervalo: </p>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna a data do próximo pastejo do Capim-Sudão BRS-Stribo: </b> </li>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080//gdsudaoProximoPastejo/{codigoINMET}/{dataInicial}/{numeroPastejos} </ul>")
+	fmt.Fprintf(w, "<p> </p>")
+	fmt.Fprintf(w, "<li> <b> Retorna o número estimados de pastejos de uma região: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
+	fmt.Fprintf(w, "</ul>")
 }
 
 // getNearStation retorna os dados da estação meteorológica mais proxima
@@ -894,7 +903,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	pPrevisaoes := ((qPre / qTot) * 100)
 	pNormais := ((qNor / qTot) * 100)
 
-	resposta := bson.M{"proxcorte": dataProximoCorte, "st": stAcumulado, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
+	resposta := bson.M{"proxpastejo": dataProximoCorte, "st": stAcumulado, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
 
 	if gds == nil {
 		fmt.Fprintf(w, "Codigo de estação inválido")
@@ -903,198 +912,6 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
-
-/*
-// getDiarios retorna os dados de medições diárias coletados por uma estação meteorológica
-func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
-
-	// Constantes
-	ST_PRIRO_CORTE := 358.00
-	ST_OUTROS_CORTES := 281.00
-
-	// Recebe os parametros enviados através da requisição HTTP
-	vars := mux.Vars(r)
-	codigoINMET := vars["codigoINMET"]
-	dataInicial := vars["dataInicial"]
-	numeroCortes := vars["numeroCortes"]
-
-	dataHoje := time.Now()
-	dataDiarios := dataHoje.AddDate(0, 0, -2)
-	dataPrevisoes := dataHoje.AddDate(0, 0, 14)
-
-	nCortes, err := strconv.ParseInt(numeroCortes, 10, 32)
-
-	// Conexão com o banco de dados
-	dataBaseURI := "mongodb://127.0.0.1:27017"
-	mongoClient := mongoapi.StartConnection(dataBaseURI)
-	collectionDiarios := mongoClient.Database("gdsudao").Collection("diarios")
-	collectionPrevisoes := mongoClient.Database("gdsudao").Collection("previsoes")
-	collectionNormais := mongoClient.Database("gdsudao").Collection("normais")
-	collectionEstacoes := mongoClient.Database("gdsudao").Collection("estacoes")
-	defer mongoapi.CloseConnection(*mongoClient)
-
-	// Conversao das datas para o formato ISO
-	layoutISO := "2006-01-02"
-	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
-	dataFinalISO := dataInicialISO.AddDate(0, 0, 100) // Arbritariamente data final nesse caso é 50 dias depois
-	//dataHoje := time.Now()
-	//dataDiarios := dataHoje.AddDate(0, 0, -2)
-	//dataPrevisoes := dataHoje.AddDate(0, 0, 14)
-
-	// Cria o slice de datas
-	var gds []gd
-	for currentDate := dataInicialISO; currentDate != dataFinalISO; currentDate = currentDate.AddDate(0, 0, 1) {
-		gd := gd{currentDate, 0, "nil", false}
-		gds = append(gds, gd)
-	}
-
-	// Tentar previsoes
-	//fmt.Fprintf(w, "Erro")
-	//fmt.Println("Nao achou em previsoes")
-
-	// Codigo INMET não bate pq as normais sao com estacoes manuais
-
-	stAtual := 0.0
-	var dataProximoCorte time.Time
-
-	// *** Pegando dado de NORMAIS ***
-	var normais bson.M
-	queryEstacao := bson.M{"codigoINMET": codigoINMET}
-	var estacao bson.M
-	err = collectionEstacoes.FindOne(context.TODO(), queryEstacao).Decode(&estacao)
-	if err != nil {
-		// Erro ao buscar estacoes
-		fmt.Println("Estacao para normais nao encontarada")
-		fmt.Println(err)
-	} else {
-		nomeEstacao := estacao["nomeEstacao"].(string)
-		queryNormais := bson.M{"nomeEstacao": nomeEstacao}
-
-		err := collectionNormais.FindOne(context.TODO(), queryNormais).Decode(&normais)
-		if err != nil {
-			normais = nil
-			fmt.Println("ERRO NAS NORMAIS")
-		}
-	}
-
-	for p, x := range gds {
-		var tmin, tmax float64
-		var fonte string
-
-		if (nCortes == 0 && stAtual >= ST_PRIRO_CORTE) || (nCortes > 0 && stAtual >= ST_OUTROS_CORTES) {
-			dataProximoCorte = x.data
-			//fmt.Println("Brak:" + x.data)
-			break
-		} else {
-			// Tenta diarios
-			var diario bson.M
-			var err error = nil
-			//Otimizacao
-			if x.data.After(dataDiarios) {
-				err = errors.New("otimizacao")
-			} else {
-				queryDiarios := bson.M{"codigoINMET": codigoINMET, "dataMedicao": x.data}
-				err = collectionDiarios.FindOne(context.TODO(), queryDiarios).Decode(&diario)
-
-				if err != nil {
-					// Tentar previsoes
-					err = nil
-					var previsao bson.M
-					//Otimizacao
-					if x.data.After(dataPrevisoes) {
-						err = errors.New("otimizacao")
-					} else {
-						queryOptions := options.FindOneOptions{}
-						queryOptions.SetSort(bson.M{"dataAtualizacao": -1, "last_error_time": 1})
-						queryPrevisoes := bson.M{"codINMET": codigoINMET, "dataPrevisao": x.data}
-						err = collectionPrevisoes.FindOne(context.TODO(), queryPrevisoes, &queryOptions).Decode(&previsao)
-					}
-					if err != nil {
-						if normais == nil {
-							// Erro ao buscar normais
-							fmt.Print("erro ao buscar normais")
-						} else {
-							// Tentando normais
-							normal := getNormal(x.data.Month().String(), normais)
-							//fmt.Println("Normal: " + normal)
-
-							// *** Pegando dado de NORMAIS ***
-							tmin = normal
-							tmax = normal
-							fonte = "normal"
-						}
-
-					} else {
-						// *** Pegando dado de PREVISAO ***
-						tmin = previsao["temperaturaMinima"].(float64)
-						tmax = previsao["temperaturaMaxima"].(float64)
-						fonte = "previsao"
-					}
-				} else {
-					// *** Pegando dados DIÁRIOS ***
-					tmin = diario["temperaturaMinima"].(float64)
-					tmax = diario["temperaturaMaxima"].(float64)
-					fonte = "diario"
-				}
-			}
-			// Atualiza o vetor de graus dia
-			grausDia := calcularGrausDia(tmin, tmax, 10.0)
-			stAtual += grausDia
-			if grausDia > 0 {
-				x.gd = grausDia
-				x.fonte = fonte
-				x.done = true
-				gds[p] = x // Atualiza o slice
-			} else {
-				x.done = false
-			}
-		}
-
-	}
-	//fmt.Println("+++++++++++++++++++++++++++++++++++++")
-	//fmt.Println(gds)
-
-	var st = 0.0
-	var qDia = 0.0
-	var qPre = 0.0
-	var qNor = 0.0
-	var qTot = 0.0
-	fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
-	for i, g := range gds {
-		fmt.Printf("Item: %d \t Data: %s \t Graus-dia: %f \t Fonte: %s \t Done: %t\n", i, g.data.Format(layoutISO), g.gd, g.fonte, g.done)
-		if g.done {
-			st += g.gd
-			switch g.fonte {
-			case "diario":
-				qDia++
-			case "previsao":
-				qPre++
-			case "normal":
-				qNor++
-			}
-			qTot++
-		} else {
-			fmt.Println("Algum dado nao foi encontrado")
-		}
-
-	}
-	//fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
-	//fmt.Printf("Intervalo: %s - %s \t Soma Termica: %f (graus dia) \t Diários: %f%% \t Previsões: %f%% \t Normais: %f%% \n", dataInicial, dataFinal, st, ((qDia / qTot) * 100), ((qPre / qTot) * 100), ((qNor / qTot) * 100))
-
-	pDiario := ((qDia / qTot) * 100)
-	pPrevisaoes := ((qPre / qTot) * 100)
-	pNormais := ((qNor / qTot) * 100)
-
-	resposta := bson.M{"proxcorte": dataProximoCorte, "st": st, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
-
-	if gds == nil {
-		fmt.Fprintf(w, "Codigo de estação inválido")
-	} else {
-		json.NewEncoder(w).Encode(resposta)
-	}
-
-}
-*/
 
 // getPasterjos retorna o número máximo de pastejos de uma área
 func getPastejos(w http.ResponseWriter, r *http.Request) {
@@ -1197,7 +1014,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/diarios/{codigoINMET}/{dataInicial}/{dataFinal}", getDiarios).Methods("GET")
 	myRouter.HandleFunc("/previsoes/{codigoINMET}/{dataAtual}", getPrevisoes).Methods("GET")
 	myRouter.HandleFunc("/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal}", getGrausDiaSudao).Methods("GET")
-	myRouter.HandleFunc("/gdsudaoProximoCorte/{codigoINMET}/{dataInicial}/{numeroCortes}", getGrausDiaSudaoProxCorte).Methods("GET")
+	myRouter.HandleFunc("/gdsudaoProximoPastejo/{codigoINMET}/{dataInicial}/{numeroCortes}", getGrausDiaSudaoProxCorte).Methods("GET")
 	myRouter.HandleFunc("/grausdia/{codigoINMET}/{temperaturaBasal}/{dataInicial}/{dataFinal}", getGrausDia).Methods("GET")
 	myRouter.HandleFunc("/pastejos/{codigoINMET}/{dataInicial}/{dataFinal}", getPastejos).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8082", myRouter))
