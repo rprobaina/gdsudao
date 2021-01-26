@@ -36,6 +36,7 @@ class DetalhesActivity : AppCompatActivity() {
             val ST_OUTROS_CORTES = 281.0f
 
             tvNomeArea.text = areas[areaIndex].nome
+            tvNomeArea.text = areas[areaIndex].nome
 
             if (!areas[areaIndex].proxcorte.isNullOrEmpty()){
                 tvDataEstimada.text = "${areas[areaIndex].proxcorte.substring(8, 10)}/${areas[areaIndex].proxcorte.substring(5, 7)}/" +
@@ -105,12 +106,14 @@ class DetalhesActivity : AppCompatActivity() {
             tvEstacao.text  = areas[areaIndex].codigoEstacao
             tvNumeroCortes.text = areas[areaIndex].numeroCorte
 
-            if (!areas[areaIndex].st.isNullOrEmpty() && !areas[areaIndex].st.isNullOrEmpty()){
+            Toast.makeText(this, areas[areaIndex].st, Toast.LENGTH_SHORT).show()
+
+            if (!areas[areaIndex].st.isNullOrEmpty() && !areas[areaIndex].numeroCorte.isNullOrEmpty()){
                 var progresso: Float
                 if (areas[areaIndex].numeroCorte.toInt() < 1) {
                     progresso = (areas[areaIndex].st.toFloat() / ST_PRIRO_CORTE) * 100
                 }else {
-                    progresso =  (areas[areaIndex].st.toFloat() / ST_OUTROS_CORTES ) * 100
+                    progresso = (areas[areaIndex].st.toFloat() / ST_OUTROS_CORTES ) * 100
                 }
 
 

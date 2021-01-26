@@ -711,20 +711,12 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	// Conversao das datas para o formato ISO
 	layoutISO := "2006-01-02"
 	dataInicialISO, _ := time.Parse(layoutISO, dataInicial)
-	//dataFinalISO, _ := time.Parse(layoutISO, dataFinal)
-	//dataFinalISO = dataFinalISO.AddDate(0, 0, 1)
 	dataHoje := time.Now()
 	dataDiarios := dataHoje.AddDate(0, 0, -2)
 	dataPrevisoes := dataHoje.AddDate(0, 0, 14)
 
 	// Cria o slice de datas
 	var gds []gd
-	/*
-		for currentDate := dataInicialISO; currentDate != dataFinalISO; currentDate = currentDate.AddDate(0, 0, 1) {
-			gd := gd{currentDate, 0, "nil", false}
-			gds = append(gds, gd)
-		}
-	*/
 
 	// Retornando normais
 	var normais bson.M
@@ -740,6 +732,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("**************************")
 		return
 	} else {
+		// Recupera normais
 		nomeEstacao := estacao["nomeEstacao"].(string)
 		queryNormais := bson.M{"nomeEstacao": nomeEstacao}
 
@@ -756,13 +749,14 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	for {
 		//pegando st até o dia atual
 		//fmt.Println(dataAtual, dataHoje)
+
 		if dataAtual.Truncate(24 * time.Hour).Equal(dataHoje.Truncate(24 * time.Hour)) {
 			fmt.Println(dataAtual, dataHoje)
 			stAcumulado = st
 		}
 
 		if (nCortes == 0 && st >= ST_PRIRO_CORTE) || (nCortes > 0 && st >= ST_OUTROS_CORTES) {
-			fmt.Println(st)
+			stAcumulado = st
 			dataProximoCorte = dataAtual.Format(layoutISO)
 			//fmt.Println("Brak:" + x.data)
 			break
@@ -903,7 +897,9 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	pPrevisaoes := ((qPre / qTot) * 100)
 	pNormais := ((qNor / qTot) * 100)
 
-	resposta := bson.M{"proxpastejo": dataProximoCorte, "st": stAcumulado, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
+	fmt.Println(st)
+	fmt.Println(stAcumulado)
+	resposta := bson.M{"proxcorte": dataProximoCorte, "st": stAcumulado, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
 
 	if gds == nil {
 		fmt.Fprintf(w, "Codigo de estação inválido")
@@ -1014,7 +1010,7 @@ func handleRequests() {
 	myRouter.HandleFunc("/diarios/{codigoINMET}/{dataInicial}/{dataFinal}", getDiarios).Methods("GET")
 	myRouter.HandleFunc("/previsoes/{codigoINMET}/{dataAtual}", getPrevisoes).Methods("GET")
 	myRouter.HandleFunc("/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal}", getGrausDiaSudao).Methods("GET")
-	myRouter.HandleFunc("/gdsudaoProximoPastejo/{codigoINMET}/{dataInicial}/{numeroCortes}", getGrausDiaSudaoProxCorte).Methods("GET")
+	myRouter.HandleFunc("/proximoPastejo/{codigoINMET}/{dataInicial}/{numeroCortes}", getGrausDiaSudaoProxCorte).Methods("GET")
 	myRouter.HandleFunc("/grausdia/{codigoINMET}/{temperaturaBasal}/{dataInicial}/{dataFinal}", getGrausDia).Methods("GET")
 	myRouter.HandleFunc("/pastejos/{codigoINMET}/{dataInicial}/{dataFinal}", getPastejos).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8082", myRouter))
