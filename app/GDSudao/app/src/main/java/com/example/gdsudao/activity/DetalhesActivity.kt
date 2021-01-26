@@ -106,7 +106,7 @@ class DetalhesActivity : AppCompatActivity() {
             tvEstacao.text  = areas[areaIndex].codigoEstacao
             tvNumeroCortes.text = areas[areaIndex].numeroCorte
 
-            Toast.makeText(this, areas[areaIndex].st, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, areas[areaIndex].st, Toast.LENGTH_SHORT).show()
 
             if (!areas[areaIndex].st.isNullOrEmpty() && !areas[areaIndex].numeroCorte.isNullOrEmpty()){
                 var progresso: Float
