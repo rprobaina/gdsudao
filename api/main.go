@@ -747,21 +747,23 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	stAcumulado := 0.0
 	dataAtual := dataInicialISO
 	for {
-		//pegando st até o dia atual
-		//fmt.Println(dataAtual, dataHoje)
 
+		// Se chegou na data atual, retonar a soma termica até aqui
 		if dataAtual.Truncate(24 * time.Hour).Equal(dataHoje.Truncate(24 * time.Hour)) {
-			fmt.Println(dataAtual, dataHoje)
+			//fmt.Println(dataAtual, dataHoje)
 			stAcumulado = st
 		}
 
 		if (nCortes == 0 && st >= ST_PRIRO_CORTE) || (nCortes > 0 && st >= ST_OUTROS_CORTES) {
-			stAcumulado = st
+			//stAcumulado = st
 			dataProximoCorte = dataAtual.Format(layoutISO)
-			//fmt.Println("Brak:" + x.data)
+			//fmt.Println("BRACK")
+			//fmt.Println(dataProximoCorte)
+			//fmt.Println(st)
+			//fmt.Println(stAcumulado)
 			break
 		} else {
-			fmt.Println(st)
+			//fmt.Println(st)
 
 			var gdAtual gd
 
@@ -845,6 +847,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 			// Atualiza o vetor de graus dia
 			grausDia := calcularGrausDia(tmin, tmax, temperaturaBasal)
 			st += grausDia
+			fmt.Println(st)
 			if grausDia > 0 {
 				gdAtual.gd = grausDia
 				gdAtual.fonte = fonte
@@ -858,7 +861,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(gds)
+	//fmt.Println(gds)
 	//fmt.Println("+++++++++++++++++++++++++++++++++++++")
 	//fmt.Println(gds)
 
@@ -867,7 +870,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	var qNor = 0.0
 	var qTot = 0.0
 
-	fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
+	//fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
 	for _, g := range gds {
 		//fmt.Printf("Item: %d \t Data: %s \t Graus-dia: %f \t Fonte: %s \t Done: %t\n", i, g.data.Format(layoutISO), g.gd, g.fonte, g.done)
 
@@ -887,7 +890,7 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-	fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
+	//fmt.Println("--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---")
 	//fmt.Printf("Intervalo: %s - %s \t Soma Termica: %f (graus dia) \t Diários: %f%% \t Previsões: %f%% \t Normais: %f%% \n", dataInicial, dataFinal, st, ((qDia / qTot) * 100), ((qPre / qTot) * 100), ((qNor / qTot) * 100))
 
 	/*
@@ -897,8 +900,12 @@ func getGrausDiaSudaoProxCorte(w http.ResponseWriter, r *http.Request) {
 	pPrevisaoes := ((qPre / qTot) * 100)
 	pNormais := ((qNor / qTot) * 100)
 
-	fmt.Println(st)
-	fmt.Println(stAcumulado)
+	//fmt.Println("FIM")
+	//fmt.Println(st)
+	//fmt.Println(stAcumulado)
+	if stAcumulado == 0 && st > 0 {
+		stAcumulado = st
+	}
 	resposta := bson.M{"proxcorte": dataProximoCorte, "st": stAcumulado, "diario": pDiario, "previsao": pPrevisaoes, "normal": pNormais}
 
 	if gds == nil {
