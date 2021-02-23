@@ -25,8 +25,8 @@ type gd struct {
 
 // homePage retorna as informações gerais da API
 func homePage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "<h1> GD Sudão Application Programing Interface </h1>")
-	fmt.Fprintf(w, "<p> Essa API compõem o FMIS GD Sudão, densenvolvido em parceiria pela Universidade Federal do Pampa e Embrapa Pecuária Sul. </p>")
+	fmt.Fprintf(w, "<h1> GD Sudão Application Programming Interface </h1>")
+	fmt.Fprintf(w, "<p> Essa API compõe o FMIS GD Sudão, densenvolvido em parceiria pela Universidade Federal do Pampa e Embrapa Pecuária Sul. </p>")
 	fmt.Fprintf(w, "<h2> Como usar: </h2>")
 	fmt.Fprintf(w, "<p> </p>")
 	fmt.Fprintf(w, "<ul>")
@@ -42,17 +42,17 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<li> <b> Retorna dados de previsão do tempo de uma estação: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/previsoes/{codigoINMET}/{dataAtual} </ul>")
 	fmt.Fprintf(w, "<p> </p>")
-	fmt.Fprintf(w, "<li> <b> Retorna a soma térmica para o Capim-Sudão BRS-Stribo e a proproção de dados utililizados: </b> </li>")
+	fmt.Fprintf(w, "<li> <b> Retorna a soma térmica para o capim sudão BRS-Stribo e a proproção de dados utililizados: </b> </li>")
 	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
 	fmt.Fprintf(w, "<p> </p>")
 	fmt.Fprintf(w, "<li> <b> Retorna a soma térmica para determinada temperatura basal e a proproção de dados utililizados: </b> </li>")
-	fmt.Fprintf(w, "<ul> https://localhost:8080/somatermica/{temperaturaBasal}/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/somatermica/{codigoINMET}/{temperaturaBasal}/{dataInicial}/{dataFinal} </ul>")
 	fmt.Fprintf(w, "<p> </p>")
 	fmt.Fprintf(w, "<li> <b> Retorna a data do próximo pastejo do Capim-Sudão BRS-Stribo: </b> </li>")
-	fmt.Fprintf(w, "<ul> https://localhost:8080//gdsudaoProximoPastejo/{codigoINMET}/{dataInicial}/{numeroPastejos} </ul>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/proximoPastejo/{codigoINMET}/{dataInicial}/{numeroPastejos} </ul>")
 	fmt.Fprintf(w, "<p> </p>")
 	fmt.Fprintf(w, "<li> <b> Retorna o número estimados de pastejos de uma região: </b> </li>")
-	fmt.Fprintf(w, "<ul> https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
+	fmt.Fprintf(w, "<ul> https://localhost:8080/pastejos/{codigoINMET}/{dataInicial}/{dataFinal} </ul>")
 	fmt.Fprintf(w, "</ul>")
 }
 
