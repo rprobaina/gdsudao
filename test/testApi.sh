@@ -132,7 +132,7 @@ echo ""
 
 # Número estimado de pastejos
 
-echo "--------- Soma térmica capim-sudão BRS-Estribo ----------"
+echo "--------- Número estimado de pastejos ----------"
 
 echo "Bagé"
 time curl 'http://localhost:8082/pastejos/A827/2020-10-01/2020-10-31'
