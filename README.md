@@ -7,7 +7,7 @@ GD Sudão é um Sistema de Informação de Gestão Agropacuária (FMIS) voltado 
 
 ### Arquitetura
 
-![](/home/ric/Downloads/gdsudao-arquitetura.png)
+![](gdsudao-arquitetura.png)
 
 
 
