@@ -81,23 +81,93 @@ Os passos a seguir devem ser executados em um sistema operacional linux, prefere
 
 #### Instalar o Módulo de coleta de dados
 
+1. Copiar os arquivos executáveis para ``/home/bin``
+
+   ```bash
+   $ cd ppgcap-recursos
+   $ mkdir -p $HOME/bin/gdsudao
+   $ cp api diarios estacoes previsoes normais $HOME/bin/gdsudao
+   ```
+
+2. Configurar a crontab
+
+   ```bash
+   $ cd ppgcap-recursos
+   $ sudo cp crontab.bk /etc/crontab
+   ```
+
+   
+
+#### Restaurar o banco de dados
+
+1. Crie o banco de dados
+
+   ```bash
+   $ cd ppgcap-recursos
+   $ ./criar-db.sh
+   Inserindo dados das Estações Meteorológicas
+   Database connection successfully started!
+   Document successfully inserted!  ObjectID("60ce59d801ed03754bf0da49")
+   Document successfully inserted!  ObjectID("60ce59da01ed03754bf0da4a")
+   ....
+   (Espere a inserção terminar)
+   ```
+
+2. Use o Mongodb Compass
+
+   1. Conecte localmente
+   2. Acesse o banco de dados **gdsudao**
+   3. Clique no botão verde **CREATE COLLECTION**
+   4. Crie a coleção (por exemplo: **normais**)
+   5. Clique no botão verde **ADD DATA**, e então em **Inport File**. Em seguiga selecione o arquivo ``ppgcap-recursos/normais.json``
+   6. Repita esse processo com as coleções **diarios** e **previsões**
 
 
 
+#### Executar
 
-#### Instalar a API
+1. Iniciar a API
 
+   ```bash
+   $ $HOME/bin/gdsuduao/api
+   ```
 
+2. Acessar a API
 
+   Acesse http://localhost:8082/ em um navegador
 
+   ```
+    GD Sudão Application Programming Interface
+   
+   Essa API compõe o FMIS GD Sudão, densenvolvido em parceiria pela Universidade Federal do Pampa e Embrapa Pecuária Sul.
+   Como usar:
+   
+       Retorna dados da estação meteorológica mais próxima a um ponto:
+           https://localhost:8080/estacao/maisproxima/{latitude}/{longitude} 
+   
+       Retorna dados de normais climatológicas de uma estação:
+           https://localhost:8080/normais/{nomeEstacao} 
+   
+       Retorna dados diários de uma estação:
+           https://localhost:8080/diarios/{codigoINMET}/{dataInicial}/{dataFinal} 
+   
+       Retorna dados de previsão do tempo de uma estação:
+           https://localhost:8080/previsoes/{codigoINMET}/{dataAtual} 
+   
+       Retorna a soma térmica para o capim sudão BRS-Stribo e a proproção de dados utililizados:
+           https://localhost:8080/gdsudao/{codigoINMET}/{dataInicial}/{dataFinal} 
+   
+       Retorna a soma térmica para determinada temperatura basal e a proproção de dados utililizados:
+           https://localhost:8080/somatermica/{codigoINMET}/{temperaturaBasal}/{dataInicial}/{dataFinal} 
+   
+       Retorna a data do próximo pastejo do Capim-Sudão BRS-Stribo:
+           https://localhost:8080/proximoPastejo/{codigoINMET}/{dataInicial}/{numeroPastejos} 
+   
+       Retorna o número estimados de pastejos de uma região:
+           https://localhost:8080/pastejos/{codigoINMET}/{dataInicial}/{dataFinal} 
+   ```
 
-#### Configurar a Crontab
-
-
-
-
-
-
+   
 
 
 
